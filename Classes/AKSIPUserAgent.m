@@ -516,6 +516,10 @@ static void AKSIPUserAgentDetectedNAT(const pj_stun_nat_detect_result *result);
     
     [self setState:kAKSIPUserAgentStarted];
     
+    
+    NSString *recording = [self recordCall];
+    NSLog(@"Record loc: %@", recording);
+    
     NSNotification *notification = [NSNotification notificationWithName:AKSIPUserAgentDidFinishStartingNotification
                                                                  object:self];
     
@@ -597,11 +601,11 @@ static void AKSIPUserAgentDetectedNAT(const pj_stun_nat_detect_result *result);
     [pool release];
 }
 
-- (BOOL)addAccount:(AKSIPAccount *)anAccount withPassword:(NSString *)aPassword {
+- (BOOL)addAccount:(AKSIPAccount *)anAccount withPassword:(NSString *)aPassword
+{
     if ([[self delegate] respondsToSelector:@selector(SIPUserAgentShouldAddAccount:)]) {
-        if (![[self delegate] SIPUserAgentShouldAddAccount:anAccount]) {
-            return NO;
-        }
+        if (![[self delegate] SIPUserAgentShouldAddAccount:anAccount]) return NO;
+        
     }
     
     pjsua_acc_config accountConfig;
@@ -930,6 +934,40 @@ static void AKSIPUserAgentDetectedNAT(const pj_stun_nat_detect_result *result);
     }
     
     return theString;
+}
+
+//Record to Audio file.  Automatically appends .wav and returns full path.
+//- (NSString*)recordCall:(AKSIPCall *)aCall withFilename:(NSString*)aFilename
+- (NSString*)recordCall
+{
+    NSString *date, *path;
+    date = [[NSDate date] descriptionWithCalendarFormat: @"%B %e, %Y" timeZone: nil locale: nil];
+    path = [NSString stringWithFormat:@"/Users/localadmin/Documents/%@",date];
+    
+    
+//    pj_status_t status = pjsua_set_snd_dev(input, output);
+    pj_str_t filename = [path pjString];
+    
+    pj_status_t status = pjsua_recorder_create( filename);
+    
+                                               return (status == PJ_SUCCESS) ? YES : NO;
+
+}
+
+//    NSLog(@"Recording call to:  %@", path);
+    
+    
+    
+/**    for (AKSIPAccount *anAccount in [[[self accounts] copy] autorelease]) {
+        for (AKSIPCall *aCall in [[[anAccount calls] copy] autorelease]) {
+*/
+//            if ([aCall identifier] == anIdentifier) {
+//                return [[aCall retain] autorelease];
+//            }
+//        }
+//    }
+
+    return path;
 }
 
 @end

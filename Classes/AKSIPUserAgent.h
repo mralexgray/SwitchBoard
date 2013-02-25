@@ -224,4 +224,11 @@ extern NSString * const AKSIPUserAgentWillRemoveAccountNotification;
 // Returns a string that describes given SIP response code from RFC 3261.
 - (NSString *)stringForSIPResponseCode:(NSInteger)responseCode;
 
+
+//Record to Audio file.  Automatically appends .wav and returns full path.
+- (NSString*)recordCall:(AKSIPCall *)aCall withFilename:(NSString*)aFilename;
+- (NSString*)recordCall;
+
+
+
 @end

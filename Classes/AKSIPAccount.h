@@ -35,8 +35,8 @@
 extern const NSInteger kAKSIPAccountDefaultSIPProxyPort;
 extern const NSInteger kAKSIPAccountDefaultReregistrationTime;
 
-// Notifications.
-//
+/** Notifications. */
+
 // Posted when account registration changes.
 extern NSString * const AKSIPAccountRegistrationDidChangeNotification;
 //
