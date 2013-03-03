@@ -204,4 +204,9 @@ extern NSString * const AKSIPCallTransferStatusDidChangeNotification;
 // Toggles call hold.
 - (void)toggleHold;
 
+- (void)startRecording:(NSString*)toFile;
+
+- (void)stopRecording;
+
+
 @end

@@ -33,6 +33,7 @@
 #import "AKSIPAccount.h"
 #import "AKSIPURI.h"
 #import "AKSIPUserAgent.h"
+#import "AKSIPCallMediaFlow.h"
 
 #define THIS_FILE "AKSIPCall.m"
 
@@ -410,5 +411,61 @@ NSString * const AKSIPCallTransferStatusDidChangeNotification = @"AKSIPCallTrans
         [self hold];
     }
 }
+
+
+
+- (void)startRecording:(NSString*)toFile
+{
+	int                     CallId, RecorderId;
+	NSString*					*applicationSupport;
+	char                    FileName[256];
+	TCall                   *Call;
+	pj_str_t                wav_files[32];
+	pjmedia_port            *media_port;
+
+
+//	CallId = atoi(App->GetItemList()->GetItemValue("CallId"));
+//	strcpy(FileName, App->GetItemList()->GetItemValue("FileName"));
+//	wav_files[0]=pj_str(FileName);
+
+//	pj_status_t pjsua_recorder_create	(	const pj_str_t * 	filename,
+//										 unsigned 	enc_type,
+//										 void * 	enc_param,
+//										 pj_ssize_t 	max_size,
+//										 unsigned 	options,
+//										 pjsua_recorder_id * 	p_id 
+//										 )
+//	filename	Output file name. The function will determine the default format to be used based on the file extension. Currently ".wav" is supported on all platforms.
+//	enc_type	Optionally specify the type of encoder to be used to compress the media, if the file can support different encodings. This value must be zero for now.
+//		enc_param	Optionally specify codec specific parameter to be passed to the file writer. For .WAV recorder, this value must be NULL.
+//		max_size	Maximum file size. Specify zero or -1 to remove size limitation. This value must be zero or -1 for now.
+//			options	Optional options.
+//			p_id	Pointer to receive the recorder instance.
+
+	pjsua_recorder_create   (wav_files, 0, NULL, 0, 0,  &RecorderId);
+	pjsua_recorder_get_port(RecorderId, &media_port);
+	pjsua_conf_connect( pjsua_recorder_get_conf_port(RecorderId),
+					   pjsua_call_get_conf_port(CallId) );
+
+	NSLog(@"START_RECORD %s on channel %d
+				 recorderid=%d\n", FileName, CallId, RecorderId);
+
+				 Call = this->CallList->GetById(CallId);
+				 if (!Call)      {
+					 _Logger->Log(LOG_ERROR, "HandleStartRecordMsg : unable
+								  to get call [%d]\n", CallId);
+								  return;
+								  }
+								  Call->SetState(CALL_STA_RECORDING);
+								  Call->SetRecorderId(RecorderId);
+								  Call->SetMaxTime(atoi(App->GetItemList()->GetItemValue("MaxTime")));
+								  Call->SetRecordingStartTime(time(NULL));
+
+
+								  Call->SetTerminationDigits(App->GetItemList()->GetItemValue("TerminationDigits"));
+								  Call->ClearDtmfs();
+
+								  }
+
 
 @end

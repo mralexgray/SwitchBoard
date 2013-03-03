@@ -226,7 +226,7 @@ extern NSString * const AKSIPUserAgentWillRemoveAccountNotification;
 
 
 //Record to Audio file.  Automatically appends .wav and returns full path.
-- (NSString*)recordCall:(AKSIPCall *)aCall withFilename:(NSString*)aFilename;
+//- (NSString*)recordCall:(AKSIPCall *)aCall withFilename:(NSString*)aFilename;
 - (NSString*)recordCall;
 
 

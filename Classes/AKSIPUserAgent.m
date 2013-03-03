@@ -943,21 +943,14 @@ static void AKSIPUserAgentDetectedNAT(const pj_stun_nat_detect_result *result);
     NSString *date, *path;
     date = [[NSDate date] descriptionWithCalendarFormat: @"%B %e, %Y" timeZone: nil locale: nil];
     path = [NSString stringWithFormat:@"/Users/localadmin/Documents/%@",date];
-    
+    return date;
     
 //    pj_status_t status = pjsua_set_snd_dev(input, output);
-    pj_str_t filename = [path pjString];
-    
-    pj_status_t status = pjsua_recorder_create( filename);
-    
-                                               return (status == PJ_SUCCESS) ? YES : NO;
-
+////    pj_str_t filename = [path pjString];
+//    pj_status_t status = pjsua_recorder_create( filename);
+//   return (status == PJ_SUCCESS) ? YES : NO;
 }
-
 //    NSLog(@"Recording call to:  %@", path);
-    
-    
-    
 /**    for (AKSIPAccount *anAccount in [[[self accounts] copy] autorelease]) {
         for (AKSIPCall *aCall in [[[anAccount calls] copy] autorelease]) {
 */
@@ -966,9 +959,8 @@ static void AKSIPUserAgentDetectedNAT(const pj_stun_nat_detect_result *result);
 //            }
 //        }
 //    }
-
-    return path;
-}
+//    return path;
+//}
 
 @end
 
