@@ -15,23 +15,14 @@
 
 @implementation ActiveCallViewController
 
-- (IBAction)mediaFlowClick:(id)sender
-
-{
-	if (_mediaFlowControl.selectedSegment == 0 )
-		[self.callController.call say:@"The Apple Software is provided by Apple on MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION"];
-		else
-		[self.callController.call play];
-
+- (IBAction)mediaFlowClick:(id)sender	{ _mediaFlowControl.selectedSegment != 0 ? 		[self.callController.call play] :
+		[self.callController.call say:@"The Apple Software is provided by Apple on MAKES "
+									  "NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION"];
 }
 - (id)initWithNibName:(NSString *)nibName callController:(CallController *)callController {
-    self = [super initWithNibName:nibName bundle:nil windowController:callController];
-    
-    if (self != nil) {
-        _enteredDTMF = [[NSMutableString alloc] init];
-        [self setCallController:callController];
-    }
-    return self;
+	return self = [super initWithNibName:nibName bundle:nil windowController:callController] ? 
+		_enteredDTMF = NSMutableString.new,
+        [self setCallController:callController], self : nil;
 }
 - (id)init {
     NSString *reason = @"Initialize ActiveCallViewController with initWithCallController:";
@@ -44,33 +35,22 @@
     [super removeObservations];
 }
 - (void)awakeFromNib {
-    [[[self displayedNameField] cell] setBackgroundStyle:NSBackgroundStyleRaised];
-    [[[self statusField] cell] setBackgroundStyle:NSBackgroundStyleRaised];
-    [[self callProgressIndicator] startAnimation:self];
-    
-    // Set hang-up button origin manually.
-    NSRect hangUpButtonFrame = [[self hangUpButton] frame];
-    NSRect progressIndicatorFrame = [[self callProgressIndicator] frame];
-    hangUpButtonFrame.origin.x = progressIndicatorFrame.origin.x + 1;
-    hangUpButtonFrame.origin.y = progressIndicatorFrame.origin.y + 1;
-    [[self hangUpButton] setFrame:hangUpButtonFrame];
-    
-    // Add mouse tracking area to switch between call progress indicator and a hang-up button in the active call view.
-    NSRect trackingRect = [[self callProgressIndicator] frame];
-    
-    NSUInteger trackingOptions = NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways;
-    
-    NSTrackingArea *trackingArea = [[NSTrackingArea alloc] initWithRect:trackingRect
-                                                                 options:trackingOptions
-                                                                   owner:self
-                                                                userInfo:nil];
-    
-    [[self view] addTrackingArea:trackingArea];
-    [self setCallProgressIndicatorTrackingArea:trackingArea];
-    
+
+    [self.displayedNameField.cell setBackgroundStyle:NSBackgroundStyleRaised];
+    [self.statusField.cell setBackgroundStyle:NSBackgroundStyleRaised];
+    [self.callProgressIndicator startAnimation:self];
+	// Set hang-up button origin manually.
+    NSRect hangUpButtonFrame 		= self.hangUpButton.frame;
+    NSRect progressIndicatorFrame 	= self.callProgressIndicator.frame;
+    hangUpButtonFrame.origin.x 		= progressIndicatorFrame.origin.x + 1;
+    hangUpButtonFrame.origin.y 		= progressIndicatorFrame.origin.y + 1;
+    self.hangUpButton.frame			= hangUpButtonFrame;
+	// Add mouse tracking area to switch between call progress indicator and a hang-up button in the active call view.
+    [self.view addTrackingArea: self.callProgressIndicatorTrackingArea =  [NSTrackingArea.alloc initWithRect:self.callProgressIndicator.frame
+								     options:NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways owner:self userInfo:nil]];
     // Add support for clicking call progress indicator to hang-up.
-    [[self callProgressIndicator] setTarget:self];
-    [[self callProgressIndicator] setAction:@selector(hangUpCall:)];
+    [self.callProgressIndicator setTarget:self];
+    [self.callProgressIndicator setAction:@selector(hangUpCall:)];
 }
 - (IBAction)hangUpCall:(id)sender {
     [[self callController] hangUpCall];
@@ -85,10 +65,8 @@
     if (![[self callController] isCallOnHold]) {
         [[self callController] toggleCallHold];
     }
-    
-    CallTransferController *callTransferController = [[self callController] callTransferController];
-    
-    [NSApp beginSheet:[callTransferController window]
+	CallTransferController *callTransferController = [[self callController] callTransferController];
+	[NSApp beginSheet:[callTransferController window]
        modalForWindow:[[self callController] window]
         modalDelegate:nil
        didEndSelector:NULL
@@ -98,8 +76,7 @@
     if ([self callTimer] != nil && [[self callTimer] isValid]) {
         return;
     }
-    
-    [self setCallTimer:
+	[self setCallTimer:
      [NSTimer scheduledTimerWithTimeInterval:0.2
                                       target:self
                                     selector:@selector(callTimerTick:)
@@ -115,8 +92,7 @@
 - (void)callTimerTick:(NSTimer *)theTimer {
     NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
     NSInteger seconds = (NSInteger)(now - ([[self callController] callStartTime]));
-    
-    if (seconds < 3600) {
+	if (seconds < 3600) {
         [[self callController] setStatus:[NSString stringWithFormat:@"%02ld:%02ld",
                                           (seconds / 60) % 60, seconds % 60]];
     } else {
@@ -126,8 +102,7 @@
     }
 }
 
-#pragma mark -
-#pragma mark NSResponder overrides
+#pragma mark - NSResponder overrides
 
 - (void)mouseEntered:(NSEvent *)theEvent {
     [[self view] replaceSubview:[self callProgressIndicator]
@@ -138,13 +113,11 @@
                            with:[self callProgressIndicator]];
 }
 
-#pragma mark -
-#pragma mark AKActiveCallViewDelegate protocol
+#pragma mark - AKActiveCallViewDelegate protocol
 
 - (void)activeCallView:(AKActiveCallView *)sender didReceiveText:(NSString *)aString {
     NSCharacterSet *DTMFCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"0123456789*#"];
-    
-    BOOL isDTMFValid = YES;
+	BOOL isDTMFValid = YES;
     for (NSUInteger i = 0; i < [aString length]; ++i) {
         unichar digit = [aString characterAtIndex:i];
         if (![DTMFCharacterSet characterIsMember:digit]) {
@@ -152,8 +125,7 @@
             break;
         }
     }
-    
-    if (isDTMFValid) {
+	if (isDTMFValid) {
         if ([[self enteredDTMF] length] == 0) {
             [[self enteredDTMF] appendString:aString];
             [[[self view] window] setTitle:[[self callController] displayedName]];
@@ -174,8 +146,7 @@
     }
 }
 
-#pragma mark -
-#pragma mark NSMenuValidation protocol
+#pragma mark - NSMenuValidation protocol
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
     if ([menuItem action] == @selector(toggleMicrophoneMute:)) {
@@ -187,37 +158,21 @@
         
         if ([[[self callController] call] state] == kAKSIPCallConfirmedState) {
             return YES;
-        } else {
-            return NO;
-        }
-        
+        } else return NO;        
     } else if ([menuItem action] == @selector(toggleCallHold:)) {
         if ([[[self callController] call] state] == kAKSIPCallConfirmedState &&
             [[[self callController] call] isOnLocalHold]) {
             [menuItem setTitle:NSLocalizedString(@"Resume", @"Resume. Call menu item.")];
-        } else {
-            [menuItem setTitle:NSLocalizedString(@"Hold", @"Hold. Call menu item.")];
-        }
-        
+        } else   [menuItem setTitle:NSLocalizedString(@"Hold", @"Hold. Call menu item.")];
         if ([[[self callController] call] state] == kAKSIPCallConfirmedState &&
-            ![[[self callController] call] isOnRemoteHold]) {
-            
-            return YES;
-            
-        } else {
-            return NO;
-        }
-        
+            ![[[self callController] call] isOnRemoteHold]) return YES; else return NO;        
     } else if ([menuItem action] == @selector(showCallTransferSheet:)) {
         if ([[[self callController] call] state] == kAKSIPCallConfirmedState &&
             ![[[self callController] call] isOnRemoteHold]) {
             
             return YES;
             
-        } else {
-            return NO;
-        }
-        
+        } else return NO;        
     } else if ([menuItem action] == @selector(hangUpCall:)) {
         [menuItem setTitle:NSLocalizedString(@"End Call", @"End Call. Call menu item.")];
     }

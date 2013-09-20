@@ -14,10 +14,8 @@
     if (![anObject isKindOfClass:[AKSIPURI class]]) {
         return nil;
     }
-    
-    NSString *returnValue = nil;
-    
-    if ([[anObject displayName] length] > 0) {
+	NSString *returnValue = nil;
+	if ([[anObject displayName] length] > 0) {
         returnValue = [anObject displayName];
         
     } else if ([[anObject user] length] > 0) {
@@ -45,10 +43,8 @@
     AKSIPURI *theURI;
     NSString *name, *destination, *user, *host;
     NSRange delimiterRange, atSignRange;
-    
-    theURI = [AKSIPURI SIPURIWithString:string];
-    
-    if (theURI == nil) {
+	theURI = [AKSIPURI SIPURIWithString:string];
+	if (theURI == nil) {
         if ([[NSPredicate predicateWithFormat:@"SELF MATCHES '.+\\\\s\\\\(.+\\\\)'"] evaluateWithObject:string]) {
             // The string is in format |Destination (Display Name)|.
             
@@ -109,8 +105,7 @@
             theURI = [AKSIPURI SIPURIWithUser:user host:host displayName:nil];
         }
     }
-    
-    if (theURI != nil) {
+	if (theURI != nil) {
         returnValue = YES;
         if (anObject != NULL) {
             *anObject = theURI;
@@ -125,10 +120,8 @@
 - (AKSIPURI *)SIPURIFromString:(NSString *)SIPURIString {
     AKSIPURI *uri;
     NSString *error;
-    
-    BOOL converted = [self getObjectValue:&uri forString:SIPURIString errorDescription:&error];
-    
-    if (converted) {
+	BOOL converted = [self getObjectValue:&uri forString:SIPURIString errorDescription:&error];
+	if (converted) {
         return uri;
     } else {
         NSLog(@"%@", error);

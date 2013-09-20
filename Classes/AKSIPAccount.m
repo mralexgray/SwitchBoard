@@ -21,14 +21,11 @@ NSString * const AKSIPAccountWillMakeCallNotification = @"AKSIPAccountWillMakeCa
     if (_delegate == aDelegate) {
         return;
     }
-    
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-    
-    if (_delegate != nil) {
+	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+	if (_delegate != nil) {
         [notificationCenter removeObserver:_delegate name:nil object:self];
     }
-    
-    if (aDelegate != nil) {
+	if (aDelegate != nil) {
         if ([aDelegate respondsToSelector:@selector(SIPAccountRegistrationDidChange:)]) {
             [notificationCenter addObserver:aDelegate
                                    selector:@selector(SIPAccountRegistrationDidChange:)
@@ -36,8 +33,7 @@ NSString * const AKSIPAccountWillMakeCallNotification = @"AKSIPAccountWillMakeCa
                                      object:self];
         }
     }
-    
-    _delegate = aDelegate;
+	_delegate = aDelegate;
 }
 - (void)setProxyPort:(NSUInteger)port {
     if (port > 0 && port < 65535) {
@@ -66,8 +62,7 @@ NSString * const AKSIPAccountWillMakeCallNotification = @"AKSIPAccountWillMakeCa
     if ([self identifier] == kAKSIPUserAgentInvalidIdentifier) {
         return;
     }
-    
-    if (value) {
+	if (value) {
         pjsua_acc_set_registration([self identifier], PJ_TRUE);
         [self setOnline:YES];
     } else {
@@ -79,11 +74,9 @@ NSString * const AKSIPAccountWillMakeCallNotification = @"AKSIPAccountWillMakeCa
     if ([self identifier] == kAKSIPUserAgentInvalidIdentifier) {
         return 0;
     }
-    
-    pjsua_acc_info accountInfo;
+	pjsua_acc_info accountInfo;
     pj_status_t status;
-    
-    status = pjsua_acc_get_info([self identifier], &accountInfo);
+	status = pjsua_acc_get_info([self identifier], &accountInfo);
     if (status != PJ_SUCCESS) {
         return 0;
     }
@@ -93,11 +86,9 @@ NSString * const AKSIPAccountWillMakeCallNotification = @"AKSIPAccountWillMakeCa
     if ([self identifier] == kAKSIPUserAgentInvalidIdentifier) {
         return nil;
     }
-    
-    pjsua_acc_info accountInfo;
+	pjsua_acc_info accountInfo;
     pj_status_t status;
-    
-    status = pjsua_acc_get_info([self identifier], &accountInfo);
+	status = pjsua_acc_get_info([self identifier], &accountInfo);
     if (status != PJ_SUCCESS) {
         return nil;
     }
@@ -107,11 +98,9 @@ NSString * const AKSIPAccountWillMakeCallNotification = @"AKSIPAccountWillMakeCa
     if ([self identifier] == kAKSIPUserAgentInvalidIdentifier) {
         return -1;
     }
-    
-    pjsua_acc_info accountInfo;
+	pjsua_acc_info accountInfo;
     pj_status_t status;
-    
-    status = pjsua_acc_get_info([self identifier], &accountInfo);
+	status = pjsua_acc_get_info([self identifier], &accountInfo);
     if (status != PJ_SUCCESS) {
         return -1;
     }
@@ -121,11 +110,9 @@ NSString * const AKSIPAccountWillMakeCallNotification = @"AKSIPAccountWillMakeCa
     if ([self identifier] == kAKSIPUserAgentInvalidIdentifier) {
         return NO;
     }
-    
-    pjsua_acc_info accountInfo;
+	pjsua_acc_info accountInfo;
     pj_status_t status;
-    
-    status = pjsua_acc_get_info([self identifier], &accountInfo);
+	status = pjsua_acc_get_info([self identifier], &accountInfo);
     if (status != PJ_SUCCESS) {
         return NO;
     }
@@ -135,8 +122,7 @@ NSString * const AKSIPAccountWillMakeCallNotification = @"AKSIPAccountWillMakeCa
     if ([self identifier] == kAKSIPUserAgentInvalidIdentifier) {
         return;
     }
-    
-    if (value) {
+	if (value) {
         pjsua_acc_set_online_status([self identifier], PJ_TRUE);
     } else {
         pjsua_acc_set_online_status([self identifier], PJ_FALSE);
@@ -146,11 +132,9 @@ NSString * const AKSIPAccountWillMakeCallNotification = @"AKSIPAccountWillMakeCa
     if ([self identifier] == kAKSIPUserAgentInvalidIdentifier) {
         return nil;
     }
-    
-    pjsua_acc_info accountInfo;
+	pjsua_acc_info accountInfo;
     pj_status_t status;
-    
-    status = pjsua_acc_get_info([self identifier], &accountInfo);
+	status = pjsua_acc_get_info([self identifier], &accountInfo);
     if (status != PJ_SUCCESS) {
         return nil;
     }
@@ -178,11 +162,9 @@ NSString * const AKSIPAccountWillMakeCallNotification = @"AKSIPAccountWillMakeCa
     if (self == nil) {
         return nil;
     }
-    
-    [self setRegistrationURI:[AKSIPURI SIPURIWithString:[NSString stringWithFormat:@"\"%@\" <sip:%@>",
+	[self setRegistrationURI:[AKSIPURI SIPURIWithString:[NSString stringWithFormat:@"\"%@\" <sip:%@>",
                                                          aFullName, aSIPAddress]]];
-    
-    [self setFullName:aFullName];
+	[self setFullName:aFullName];
     [self setSIPAddress:aSIPAddress];
     [self setRegistrar:aRegistrar];
     [self setRealm:aRealm];
@@ -190,8 +172,7 @@ NSString * const AKSIPAccountWillMakeCallNotification = @"AKSIPAccountWillMakeCa
     [self setProxyPort:kAKSIPAccountDefaultSIPProxyPort];
     [self setReregistrationTime:kAKSIPAccountDefaultReregistrationTime];
     [self setIdentifier:kAKSIPUserAgentInvalidIdentifier];
-    
-    _calls = [[NSMutableArray alloc] init];
+	_calls = [[NSMutableArray alloc] init];
 	return self;
 }
 - (id)init {
@@ -199,8 +180,7 @@ NSString * const AKSIPAccountWillMakeCallNotification = @"AKSIPAccountWillMakeCa
 }
 - (void)dealloc {
     [self setDelegate:nil];
-    
-    
+	
     
     
 }
@@ -210,11 +190,9 @@ NSString * const AKSIPAccountWillMakeCallNotification = @"AKSIPAccountWillMakeCa
 - (AKSIPCall *)makeCallTo:(AKSIPURI *)destinationURI {
     [[NSNotificationCenter defaultCenter] postNotificationName:AKSIPAccountWillMakeCallNotification
                                                         object:self];
-    
-    pjsua_call_id callIdentifier;
+	pjsua_call_id callIdentifier;
     pj_str_t uri = [[destinationURI description] pjString];
-    
-    pj_status_t status = pjsua_call_make_call([self identifier], &uri, 0, NULL, NULL, &callIdentifier);
+	pj_status_t status = pjsua_call_make_call([self identifier], &uri, 0, NULL, NULL, &callIdentifier);
     AKSIPCall *theCall = nil;
     if (status == PJ_SUCCESS) {
         for (AKSIPCall *aCall in [[self calls] copy]) {

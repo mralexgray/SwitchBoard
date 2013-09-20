@@ -6,15 +6,10 @@
 #import <pjsua-lib/pjsua.h>
 
 // User agent states.
-enum {
-    kAKSIPUserAgentStopped,
-    kAKSIPUserAgentStarting,
-    kAKSIPUserAgentStarted
-};
-typedef NSUInteger AKSIPUserAgentState;
+typedef NS_ENUM(NSUInteger,AKSIPUserAgentState) {   kAKSIPUserAgentStopped, kAKSIPUserAgentStarting, kAKSIPUserAgentStarted };
 
 // NAT types, as specified by RFC 3489.
-enum {
+typedef NS_ENUM(NSUInteger,AKNATType){
     kAKNATTypeUnknown        = PJ_STUN_NAT_TYPE_UNKNOWN,
     kAKNATTypeErrorUnknown   = PJ_STUN_NAT_TYPE_ERR_UNKNOWN,
     kAKNATTypeOpen           = PJ_STUN_NAT_TYPE_OPEN,
@@ -25,72 +20,43 @@ enum {
     kAKNATTypeRestricted     = PJ_STUN_NAT_TYPE_RESTRICTED,
     kAKNATTypePortRestricted = PJ_STUN_NAT_TYPE_PORT_RESTRICTED
 };
-typedef NSUInteger AKNATType;
-
-typedef struct _AKSIPUserAgentCallData {
-    pj_timer_entry timer;
-    pj_bool_t ringbackOn;
-    pj_bool_t ringbackOff;
-} AKSIPUserAgentCallData;
+typedef struct _AKSIPUserAgentCallData { pj_timer_entry timer;  pj_bool_t ringbackOn;  pj_bool_t ringbackOff; } AKSIPUserAgentCallData;
 
 // An invalid identifier for all sorts of identifiers.
 extern const NSInteger kAKSIPUserAgentInvalidIdentifier;
 
 // Notifications.
-//
 // All AKSIPUserAgent notifications are posted by the user agent instance returned by |sharedUserAgent|.
-//
 // Posted when the user agent finishes starting. However, it may not be started if an error occurred during user agent
 // start-up. You can check user agent state via the |state| property.
 extern NSString * const AKSIPUserAgentDidFinishStartingNotification;
-//
 // Posted when the user agent finishes stopping.
 extern NSString * const AKSIPUserAgentDidFinishStoppingNotification;
-//
 // Posted when the user agent detects NAT type, which can be accessed via
 // the |detectedNATType| property.
 extern NSString * const AKSIPUserAgentDidDetectNATNotification;
-//
 // Posted when the user agent is about to remove an account.
 extern NSString * const AKSIPUserAgentWillRemoveAccountNotification;
 
 @class AKSIPAccount;
-
-// Declares the interface that AKSIPUserAgent delegates must implement.
-@protocol AKSIPUserAgentDelegate <NSObject>
-@optional
-// Sent when AKSIPUserAgent is about to add an account. It is a good moment to
-// start user agent lazily, when the first account is added.
+@protocol AKSIPUserAgentDelegate <NSObject>  // Declares the interface that AKSIPUserAgent delegates must implement.
+@optional	// Sent when AKSIPUserAgent is about to add an account. It is a good moment to
+			// start user agent lazily, when the first account is added.
 - (BOOL)SIPUserAgentShouldAddAccount:(AKSIPAccount *)anAccount;
 @end
 
 @class AKSIPCall;
-
 // The AKSIPUserAgent class implements SIP User Agent functionality. You can use it to create, configure, and start user
 // agent, add and remove accounts, and set sound devices for input and output. You need to restart the user agent after
 // you change its properties when it is already running.
-@interface AKSIPUserAgent : NSObject {
-  @private
-    AKSIPUserAgentCallData _callData[PJSUA_MAX_CALLS];
-}
+@interface AKSIPUserAgent : NSObject {  @private    AKSIPUserAgentCallData _callData[PJSUA_MAX_CALLS]; }
 
-// The receiver's delegate.
-@property (nonatomic, assign) id <AKSIPUserAgentDelegate> delegate;
-
-// Accounts added to the receiver.
-@property (readonly, retain) NSMutableArray *accounts;
-
-// A Boolean value indicating whether the receiver has been started.
-@property (nonatomic, readonly, assign, getter=isStarted) BOOL started;
-
-// Receiver's state.
-@property (readonly, assign) AKSIPUserAgentState state;
-
-// NAT type that has been detected by the receiver.
-@property (assign) AKNATType detectedNATType;
-
-// A lock that is used to start and stop the receiver.
-@property (retain) NSLock *pjsuaLock;
+@property (nonatomic, assign) id <AKSIPUserAgentDelegate> delegate; 		// The receiver's delegate.
+@property (readonly, retain) NSMutableArray *accounts;						// Accounts added to the receiver.
+@property (nonatomic, readonly, assign, getter=isStarted) BOOL started;		// A Boolean value indicating whether the receiver has been started.
+@property (readonly, assign) AKSIPUserAgentState state;						// Receiver's state.								
+@property (assign) AKNATType detectedNATType;								// NAT type that has been detected by the receiver.
+@property (retain) NSLock *pjsuaLock;										// A lock that is used to start and stop the receiver.
 
 // The number of acitve calls controlled by the receiver.
 @property (nonatomic, readonly, assign) NSUInteger activeCallsCount;

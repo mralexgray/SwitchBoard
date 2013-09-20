@@ -13,8 +13,7 @@
     NSInteger personFlags = [[self valueForProperty:kABPersonFlags] integerValue];
     BOOL isPerson = (personFlags & kABShowAsMask) == kABShowAsPerson;
     BOOL isCompany = (personFlags & kABShowAsMask) == kABShowAsCompany;
-    
-    ABAddressBook *AB = [ABAddressBook sharedAddressBook];
+	ABAddressBook *AB = [ABAddressBook sharedAddressBook];
     NSString *theString = nil;
     if (isPerson) {
         if ([firstName length] > 0 && [lastName length] > 0) {

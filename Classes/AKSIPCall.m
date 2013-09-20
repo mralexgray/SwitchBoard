@@ -53,14 +53,11 @@ NSString * const AKSIPCallTransferStatusDidChangeNotification = @"AKSIPCallTrans
     if (_delegate == aDelegate) {
         return;
     }
-    
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-    
-    if (_delegate != nil) {
+	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+	if (_delegate != nil) {
         [notificationCenter removeObserver:_delegate name:nil object:self];
     }
-    
-    if (aDelegate != nil) {
+	if (aDelegate != nil) {
         // Subscribe to notifications
         if ([aDelegate respondsToSelector:@selector(SIPCallCalling:)]) {
             [notificationCenter addObserver:aDelegate
@@ -123,8 +120,7 @@ NSString * const AKSIPCallTransferStatusDidChangeNotification = @"AKSIPCallTrans
                                      object:self];
         }
     }
-    
-    _delegate = aDelegate;
+	_delegate = aDelegate;
 }
 - (BOOL)isActive {
     if ([self identifier] == kAKSIPUserAgentInvalidIdentifier) {
@@ -142,8 +138,7 @@ NSString * const AKSIPCallTransferStatusDidChangeNotification = @"AKSIPCallTrans
     if ([self identifier] == kAKSIPUserAgentInvalidIdentifier) {
         return NO;
     }
-    
-    pjsua_call_info callInfo;
+	pjsua_call_info callInfo;
     pjsua_call_get_info([self identifier], &callInfo);
 	return (callInfo.media_status == PJSUA_CALL_MEDIA_ACTIVE) ? YES : NO;
 }
@@ -151,8 +146,7 @@ NSString * const AKSIPCallTransferStatusDidChangeNotification = @"AKSIPCallTrans
     if ([self identifier] == kAKSIPUserAgentInvalidIdentifier) {
         return NO;
     }
-    
-    pjsua_call_info callInfo;
+	pjsua_call_info callInfo;
     pjsua_call_get_info([self identifier], &callInfo);
 	return (callInfo.media_status == PJSUA_CALL_MEDIA_LOCAL_HOLD) ? YES : NO;
 }
@@ -160,8 +154,7 @@ NSString * const AKSIPCallTransferStatusDidChangeNotification = @"AKSIPCallTrans
     if ([self identifier] == kAKSIPUserAgentInvalidIdentifier) {
         return NO;
     }
-    
-    pjsua_call_info callInfo;
+	pjsua_call_info callInfo;
     pjsua_call_get_info([self identifier], &callInfo);
 	return (callInfo.media_status == PJSUA_CALL_MEDIA_REMOTE_HOLD) ? YES : NO;
 }
@@ -173,11 +166,9 @@ NSString * const AKSIPCallTransferStatusDidChangeNotification = @"AKSIPCallTrans
     if (self == nil) {
         return nil;
     }
-    
-    [self setIdentifier:anIdentifier];
+	[self setIdentifier:anIdentifier];
     [self setAccount:anAccount];
-    
-    pjsua_call_info callInfo;
+	pjsua_call_info callInfo;
     pj_status_t status = pjsua_call_get_info(anIdentifier, &callInfo);
     if (status == PJ_SUCCESS) {
         [self setState:callInfo.state];
@@ -206,10 +197,8 @@ NSString * const AKSIPCallTransferStatusDidChangeNotification = @"AKSIPCallTrans
     if ([[AKSIPUserAgent sharedUserAgent] isStarted]) {
         [self hangUp];
     }
-    
-    [self setDelegate:nil];
-    
-    
+	[self setDelegate:nil];
+	
 }
 - (NSString *)description {
     return [NSString stringWithFormat:@"%@ <=> %@", [self localURI], [self remoteURI]];
@@ -222,8 +211,7 @@ NSString * const AKSIPCallTransferStatusDidChangeNotification = @"AKSIPCallTrans
     if (([self identifier] == kAKSIPUserAgentInvalidIdentifier) || ([self state] == kAKSIPCallDisconnectedState)) {
         return;
     }
-    
-    pj_status_t status = pjsua_call_hangup([self identifier], 0, NULL, NULL);
+	pj_status_t status = pjsua_call_hangup([self identifier], 0, NULL, NULL);
     if (status != PJ_SUCCESS) {
         NSLog(@"Error hanging up call %@", self);
     }
@@ -259,23 +247,19 @@ NSString * const AKSIPCallTransferStatusDidChangeNotification = @"AKSIPCallTrans
 }
 - (void)ringbackStart {
     AKSIPUserAgent *userAgent = [AKSIPUserAgent sharedUserAgent];
-    
-    // Use dot syntax for properties to prevent square bracket clutter.
+	// Use dot syntax for properties to prevent square bracket clutter.
     if (userAgent.callData[self.identifier].ringbackOn) {
         return;
     }
-    
-    userAgent.callData[self.identifier].ringbackOn = PJ_TRUE;
-    
-    [userAgent setRingbackCount:[userAgent ringbackCount] + 1];
+	userAgent.callData[self.identifier].ringbackOn = PJ_TRUE;
+	[userAgent setRingbackCount:[userAgent ringbackCount] + 1];
     if ([userAgent ringbackCount] == 1 && [userAgent ringbackSlot] != kAKSIPUserAgentInvalidIdentifier) {
         pjsua_conf_connect([userAgent ringbackSlot], 0);
     }
 }
 - (void)ringbackStop {
     AKSIPUserAgent *userAgent = [AKSIPUserAgent sharedUserAgent];
-    
-    // Use dot syntax for properties to prevent square bracket clutter.
+	// Use dot syntax for properties to prevent square bracket clutter.
     if (userAgent.callData[self.identifier].ringbackOn) {
         userAgent.callData[self.identifier].ringbackOn = PJ_FALSE;
         
@@ -292,11 +276,9 @@ NSString * const AKSIPCallTransferStatusDidChangeNotification = @"AKSIPCallTrans
 - (void)sendDTMFDigits:(NSString *)digits {
     pj_status_t status;
     pj_str_t pjDigits = [digits pjString];
-    
-    // Try to send RFC2833 DTMF first.
+	// Try to send RFC2833 DTMF first.
     status = pjsua_call_dial_dtmf([self identifier], &pjDigits);
-    
-    if (status != PJ_SUCCESS) {  // Okay, that didn't work. Send INFO DTMF.
+	if (status != PJ_SUCCESS) {  // Okay, that didn't work. Send INFO DTMF.
         const pj_str_t kSIPINFO = pj_str("INFO");
         
         for (NSUInteger i = 0; i < [digits length]; ++i) {
@@ -319,11 +301,9 @@ NSString * const AKSIPCallTransferStatusDidChangeNotification = @"AKSIPCallTrans
     if ([self isMicrophoneMuted] || [self state] != kAKSIPCallConfirmedState) {
         return;
     }
-    
-    pjsua_call_info callInfo;
+	pjsua_call_info callInfo;
     pjsua_call_get_info([self identifier], &callInfo);
-    
-    pj_status_t status = pjsua_conf_disconnect(0, callInfo.conf_slot);
+	pj_status_t status = pjsua_conf_disconnect(0, callInfo.conf_slot);
     if (status == PJ_SUCCESS) {
         [self setMicrophoneMuted:YES];
     } else {
@@ -334,11 +314,9 @@ NSString * const AKSIPCallTransferStatusDidChangeNotification = @"AKSIPCallTrans
     if (![self isMicrophoneMuted] || [self state] != kAKSIPCallConfirmedState) {
         return;
     }
-    
-    pjsua_call_info callInfo;
+	pjsua_call_info callInfo;
     pjsua_call_get_info([self identifier], &callInfo);
-    
-    pj_status_t status = pjsua_conf_connect(0, callInfo.conf_slot);
+	pj_status_t status = pjsua_conf_connect(0, callInfo.conf_slot);
     if (status == PJ_SUCCESS) {
         [self setMicrophoneMuted:NO];
     } else {

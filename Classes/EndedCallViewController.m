@@ -10,8 +10,7 @@
 
 - (id)initWithNibName:(NSString *)nibName callController:(CallController *)callController {
     self = [super initWithNibName:nibName bundle:nil windowController:callController];
-    
-    if (self != nil) {
+	if (self != nil) {
         [self setCallController:callController];
     }
     return self;

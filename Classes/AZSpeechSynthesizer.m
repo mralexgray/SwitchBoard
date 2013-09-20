@@ -118,19 +118,16 @@
 @end
 		
 
-//
 // Callback routines
 //
 
 //
 //			AN	IMPORTANT NOTE ABOUT CALLBACKS AND THREADS
-//
 // All speech synthesis callbacks, except for the Text Done callback, call their specified routine on a
 // thread other than the main thread.  Performing certain actions directly from a speech synthesis callback
 // routine may cause your program to crash without certain safe gaurds.	 In this example, we use the NSThread
 // method performSelectorOnMainThread:withObject:waitUntilDone: to safely update the user interface and
 // interact with our objects using only the main thread.
-//
 // Depending on your needs you may be able to specify your Cocoa application is multiple threaded
 // then preform actions directly from the speech synthesis callback routines.  To indicate your Cocoa
 // application is mulitthreaded, call the following line before calling speech synthesis routines for

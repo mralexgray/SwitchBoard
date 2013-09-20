@@ -18,14 +18,12 @@
 }
 - (void)awakeFromNib {
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-    
-    // Subscribe on mouse-down event of the ringing sound selection.
+	// Subscribe on mouse-down event of the ringing sound selection.
     [notificationCenter addObserver:self
                            selector:@selector(popUpButtonWillPopUp:)
                                name:NSPopUpButtonWillPopUpNotification
                              object:[self ringtonePopUp]];
-    
-    [self updateAvailableSounds];
+	[self updateAvailableSounds];
     [self updateAudioDevices];
 }
 - (void)dealloc {
@@ -38,8 +36,7 @@
     [defaults setObject:[[self soundInputPopUp] titleOfSelectedItem] forKey:kSoundInput];
     [defaults setObject:[[self soundOutputPopUp] titleOfSelectedItem] forKey:kSoundOutput];
     [defaults setObject:[[self ringtoneOutputPopUp] titleOfSelectedItem] forKey:kRingtoneOutput];
-    
-    [[NSApp delegate] selectSoundIO];
+	[[NSApp delegate] selectSoundIO];
 }
 - (void)updateAudioDevices {
     // Populate sound IO pop-up buttons.
@@ -47,8 +44,7 @@
     NSMenu *soundInputMenu = [[NSMenu alloc] init];
     NSMenu *soundOutputMenu = [[NSMenu alloc] init];
     NSMenu *ringtoneOutputMenu = [[NSMenu alloc] init];
-    
-    for (NSUInteger i = 0; i < [audioDevices count]; ++i) {
+	for (NSUInteger i = 0; i < [audioDevices count]; ++i) {
         NSDictionary *deviceDict = audioDevices[i];
         
         NSMenuItem *aMenuItem = [[NSMenuItem alloc] init];
@@ -65,26 +61,21 @@
         }
         
     }
-    
-    [[self soundInputPopUp] setMenu:soundInputMenu];
+	[[self soundInputPopUp] setMenu:soundInputMenu];
     [[self soundOutputPopUp] setMenu:soundOutputMenu];
     [[self ringtoneOutputPopUp] setMenu:ringtoneOutputMenu];
-    
-    // Select saved sound devices.
+	// Select saved sound devices.
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
-    NSString *lastSoundInput = [defaults stringForKey:kSoundInput];
+	NSString *lastSoundInput = [defaults stringForKey:kSoundInput];
     if (lastSoundInput != nil && [[self soundInputPopUp] itemWithTitle:lastSoundInput] != nil) {
         [[self soundInputPopUp] selectItemWithTitle:lastSoundInput];
     }
-    
-    NSString *lastSoundOutput = [defaults stringForKey:kSoundOutput];
+	NSString *lastSoundOutput = [defaults stringForKey:kSoundOutput];
     if (lastSoundOutput != nil && [[self soundOutputPopUp] itemWithTitle:lastSoundOutput] != nil) {
         [[self soundOutputPopUp] selectItemWithTitle:lastSoundOutput];
     }
-    
-    NSString *lastRingtoneOutput = [defaults stringForKey:kRingtoneOutput];
+	NSString *lastRingtoneOutput = [defaults stringForKey:kRingtoneOutput];
     if (lastRingtoneOutput != nil && [[self ringtoneOutputPopUp] itemWithTitle:lastRingtoneOutput] != nil) {
         [[self ringtoneOutputPopUp] selectItemWithTitle:lastRingtoneOutput];
     }
@@ -94,13 +85,11 @@
     if ([libraryPaths count] <= 0) {
         return;
     }
-    
-    NSMenu *soundsMenu = [[NSMenu alloc] init];
+	NSMenu *soundsMenu = [[NSMenu alloc] init];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSSet *allowedSoundFileExtensions = [NSSet setWithObjects:@"aiff", @"aif", @"aifc",
                                          @"mp3", @"wav", @"sd2", @"au", @"snd", @"m4a", @"m4p", nil];
-    
-    for (NSUInteger i = 0; i < [libraryPaths count]; ++i) {
+	for (NSUInteger i = 0; i < [libraryPaths count]; ++i) {
         NSString *aPath = libraryPaths[i];
         NSString *soundPath = [aPath stringByAppendingPathComponent:@"Sounds"];
         NSArray *soundFiles = [fileManager contentsOfDirectoryAtPath:soundPath error:NULL];
@@ -126,28 +115,22 @@
             }
         }
     }
-    
-    [[self ringtonePopUp] setMenu:soundsMenu];
-    
-    NSString *savedSound = [[NSUserDefaults standardUserDefaults] stringForKey:kRingingSound];
-    
-    if ([soundsMenu itemWithTitle:savedSound] != nil) {
+	[[self ringtonePopUp] setMenu:soundsMenu];
+	NSString *savedSound = [[NSUserDefaults standardUserDefaults] stringForKey:kRingingSound];
+	if ([soundsMenu itemWithTitle:savedSound] != nil) {
         [[self ringtonePopUp] selectItemWithTitle:savedSound];
     }
 }
 - (IBAction)changeRingtone:(id)sender {
     [[[NSApp delegate] ringtone] stop];
-    
-    NSString *soundName = [sender title];
+	NSString *soundName = [sender title];
     [[NSUserDefaults standardUserDefaults] setObject:soundName forKey:kRingingSound];
     [[NSApp delegate] setRingtone:[NSSound soundNamed:soundName]];
-    
-    // Play selected ringtone once.
+	// Play selected ringtone once.
     [[[NSApp delegate] ringtone] play];
 }
 
-#pragma mark -
-#pragma mark NSPopUpButton notification
+#pragma mark - NSPopUpButton notification
 
 - (void)popUpButtonWillPopUp:(NSNotification *)notification {
     [self updateAvailableSounds];

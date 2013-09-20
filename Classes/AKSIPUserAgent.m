@@ -1,32 +1,8 @@
 //
 //  AKSIPUserAgent.m
 //  Telephone
-//
 //  Copyright (c) 2008-2012 Alexei Kuznetsov. All rights reserved.
-//
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions are met:
-//  1. Redistributions of source code must retain the above copyright notice,
-//     this list of conditions and the following disclaimer.
-//  2. Redistributions in binary form must reproduce the above copyright notice,
-//     this list of conditions and the following disclaimer in the documentation
-//     and/or other materials provided with the distribution.
-//  3. Neither the name of the copyright holder nor the names of contributors
-//     may be used to endorse or promote products derived from this software
-//     without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-//  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-//  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-//  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE THE COPYRIGHT HOLDER
-//  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-//  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-//  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-//  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-//  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-//  OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-//  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
+
 
 #import "AKSIPUserAgent.h"
 
@@ -67,27 +43,21 @@ static const NSInteger kAKSIPUserAgentDefaultTransportPort = 0;
 static AKSIPUserAgent *sharedUserAgent = nil;
 
 // Callbacks from PJSUA.
-//
 // Sent when incoming call is received.
 static void AKSIPCallIncomingReceived(pjsua_acc_id, pjsua_call_id,
 									  pjsip_rx_data *);
-//
 // Sent when call state changes.
 static void AKSIPCallStateChanged(pjsua_call_id, pjsip_event *);
-//
 // Sent when media state of the call changes.
 static void AKSIPCallMediaStateChanged(pjsua_call_id);
-//
 // Sent when call transfer status changes.
 static void AKSIPCallTransferStatusChanged(pjsua_call_id callIdentifier,
 										   int statusCode,
 										   const pj_str_t *statusText,
 										   pj_bool_t isFinal,
 										   pj_bool_t *pCont);
-//
 // Sent when account registration state changes.
 static void AKSIPAccountRegistrationStateChanged(pjsua_acc_id accountIdentifier);
-//
 // Sent when NAT type is detected.
 static void AKSIPUserAgentDetectedNAT(const pj_stun_nat_detect_result *result);
 
@@ -892,8 +862,7 @@ static void AKSIPUserAgentDetectedNAT(const pj_stun_nat_detect_result *result);
 
 @end
 
-#pragma mark -
-#pragma mark PJSUA callbacks
+#pragma mark - PJSUA callbacks
 
 static void AKSIPCallIncomingReceived(pjsua_acc_id accountIdentifier,
 									  pjsua_call_id callIdentifier,

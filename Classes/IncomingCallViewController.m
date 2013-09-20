@@ -14,8 +14,7 @@
 
 - (id)initWithCallController:(CallController *)callController {
     self = [super initWithNibName:@"IncomingCallView" bundle:nil windowController:callController];
-    
-    if (self != nil) {
+	if (self != nil) {
         [self setCallController:callController];
     }
     return self;
@@ -41,8 +40,7 @@
     [[self callController] hangUpCall];
 }
 
-#pragma mark -
-#pragma mark NSMenuValidation protocol
+#pragma mark - NSMenuValidation protocol
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
     if ([menuItem action] == @selector(hangUpCall:)) {

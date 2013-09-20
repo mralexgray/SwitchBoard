@@ -10,8 +10,7 @@
     void *passwordData = nil;
     UInt32 passwordLength;
     OSStatus findStatus;
-    
-    findStatus = SecKeychainFindGenericPassword(NULL,   // Default keychain.
+	findStatus = SecKeychainFindGenericPassword(NULL,   // Default keychain.
                                                 [serviceName length],
                                                 [serviceName UTF8String],
                                                 [accountName length],
@@ -23,12 +22,10 @@
     if (findStatus != noErr) {
         return nil;
     }
-    
-    NSString *password = [[NSString alloc] initWithBytes:passwordData
+	NSString *password = [[NSString alloc] initWithBytes:passwordData
                                                    length:passwordLength
                                                  encoding:NSUTF8StringEncoding];
-    
-    SecKeychainItemFreeContent(NULL, passwordData);
+	SecKeychainItemFreeContent(NULL, passwordData);
 	return password;
 }
 
@@ -39,8 +36,7 @@
     SecKeychainItemRef keychainItemRef = nil;
     OSStatus addStatus, findStatus, modifyStatus;
     BOOL success = NO;
-    
-    // Add item to keychain.
+	// Add item to keychain.
     addStatus = SecKeychainAddGenericPassword(NULL,   // NULL for default keychain.
                                               [serviceName length],
                                               [serviceName UTF8String],
@@ -76,8 +72,7 @@
             }
         }
     }
-    
-    if (keychainItemRef != nil) {
+	if (keychainItemRef != nil) {
         CFRelease(keychainItemRef);
     }
 	return success;

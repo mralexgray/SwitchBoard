@@ -6,15 +6,12 @@
 #import <SystemConfiguration/SystemConfiguration.h>
 
 // Notifications.
-//
 // Sent when target host becomes reachable.
 extern NSString * const AKNetworkReachabilityDidBecomeReachableNotification;
-//
 // Sent when target host becomes unreachable.
 extern NSString * const AKNetworkReachabilityDidBecomeUnreachableNotification;
-
-// Wrapper for SCNetworkReachability.
-@interface AKNetworkReachability : NSObject {
+@interface AKNetworkReachability : NSObject    // Wrapper for SCNetworkReachability.
+{
   @private
     SCNetworkReachabilityRef _reachability;  // Strong.
     SCNetworkReachabilityContext _context;

@@ -10,11 +10,9 @@
     if (![anObject isKindOfClass:[NSString class]]) {
         return nil;
     }
-    
-    NSString *theString;
+	NSString *theString;
     NSUInteger length = [anObject length];
-    
-    if ([[NSPredicate predicateWithFormat:@"SELF MATCHES '\\\\d{6,15}'"] evaluateWithObject:anObject]) {
+	if ([[NSPredicate predicateWithFormat:@"SELF MATCHES '\\\\d{6,15}'"] evaluateWithObject:anObject]) {
         switch (length) {
             case 6:
                 if ([self splitsLastFourDigits]) {  // ##-##-##
@@ -198,13 +196,11 @@
 }
 - (BOOL)getObjectValue:(id *)anObject forString:(NSString *)string errorDescription:(NSString **)error {
     BOOL returnValue = NO;
-    
-    NSMutableCharacterSet *phoneNumberCharacterSet
+	NSMutableCharacterSet *phoneNumberCharacterSet
         = [[NSCharacterSet characterSetWithCharactersInString:@"0123456789"] copy];
     NSScanner *scanner = [NSScanner scannerWithString:string];
     NSMutableString *telephoneNumber = [[NSMutableString alloc] init];
-    
-    if ([string hasPrefix:@"+"]) {
+	if ([string hasPrefix:@"+"]) {
         [telephoneNumber appendString:@"+"];
         [scanner setScanLocation:1];
     } else {
@@ -212,8 +208,7 @@
         // number sign.
         [phoneNumberCharacterSet addCharactersInString:@"*#"];
     }
-    
-    NSString *aString;
+	NSString *aString;
     while (![scanner isAtEnd]) {
         [scanner scanUpToCharactersFromSet:phoneNumberCharacterSet intoString:NULL];
         BOOL scanned = [scanner scanCharactersFromSet:phoneNumberCharacterSet intoString:&aString];
@@ -221,8 +216,7 @@
             [telephoneNumber appendString:aString];
         }
     }
-    
-    if ([telephoneNumber length] > 0) {
+	if ([telephoneNumber length] > 0) {
         returnValue = YES;
         if (anObject != NULL) {
             *anObject = [telephoneNumber copy];

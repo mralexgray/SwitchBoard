@@ -2,10 +2,15 @@
 //  NetworkPreferencesViewController.m
 //  Telephone
 
+
+#import "NetworkPreferencesViewController.h"
+#import "AppController.h"
+#import "PreferencesController.h"
 #import "NetworkPreferencesViewController.h"
 
 #import "AppController.h"
 #import "PreferencesController.h"
+
 
 @interface NetworkPreferencesViewController ()
 
@@ -20,8 +25,10 @@
     if (self != nil) {
         [self setTitle:NSLocalizedString(@"Network", @"Network preferences window title.")];
     }
-	return self;
+    
+    return self;
 }
+
 - (void)awakeFromNib {
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     
@@ -34,7 +41,7 @@
     // Show user agent's current transport port as a placeholder string.
     if ([[[NSApp delegate] userAgent] isStarted]) {
         [[[self transportPortField] cell] setPlaceholderString:
-         [@([[[NSApp delegate] userAgent] transportPort]) stringValue]];
+         [[NSNumber numberWithUnsignedInteger:[[[NSApp delegate] userAgent] transportPort]] stringValue]];
     }
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -59,19 +66,11 @@
         [[self outboundProxyPortField] setIntegerValue:[defaults integerForKey:kOutboundProxyPort]];
     }
 }
+
 - (void)dealloc {
-    [_transportPortField release];
-    [_STUNServerHostField release];
-    [_STUNServerPortField release];
-    [_useICECheckBox release];
-    [_useDNSSRVCheckBox release];
-    [_outboundProxyHostField release];
-    [_outboundProxyPortField release];
-    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
-    [super dealloc];
 }
+
 - (BOOL)checkForNetworkSettingsChanges:(id)sender {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSCharacterSet *spacesSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
@@ -97,11 +96,11 @@
         [[[self preferencesController] toolbar] setSelectedItemIdentifier:
          [[[self preferencesController] networkToolbarItem] itemIdentifier]];
         
-        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        NSAlert *alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle:NSLocalizedString(@"Save", @"Save button.")];
         [alert addButtonWithTitle:NSLocalizedString(@"Cancel", @"Cancel button.")];
         [alert addButtonWithTitle:NSLocalizedString(@"Don't Save", @"Don't save button.")];
-        [[alert buttons][1] setKeyEquivalent:@"\033"];
+        [[[alert buttons] objectAtIndex:1] setKeyEquivalent:@"\033"];
         [alert setMessageText:NSLocalizedString(@"Save changes to the network settings?",
                                                 @"Network settings change confirmation.")];
         [alert setInformativeText:NSLocalizedString(@"New network settings will be applied immediately, all "
@@ -111,11 +110,13 @@
         [alert beginSheetModalForWindow:[[self preferencesController] window]
                           modalDelegate:self
                          didEndSelector:@selector(networkSettingsChangeAlertDidEnd:returnCode:contextInfo:)
-                            contextInfo:sender];
+                            contextInfo:(__bridge void *)(sender)];
         return YES;
     }
-	return NO;
+    
+    return NO;
 }
+
 - (void)networkSettingsChangeAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo {
     [[alert window] orderOut:nil];
     
@@ -125,7 +126,7 @@
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSCharacterSet *spacesSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-    id sender = (id)contextInfo;
+    id sender = (__bridge id)contextInfo;
     
     if (returnCode == NSAlertFirstButtonReturn) {
         [[[self transportPortField] cell] setPlaceholderString:[[self transportPortField] stringValue]];
@@ -189,6 +190,7 @@
     }
 }
 
+
 #pragma mark -
 #pragma mark AKSIPUserAgent notifications
 
@@ -199,7 +201,7 @@
     
     // Show transport port in the network preferences as a placeholder string.
     [[[self transportPortField] cell] setPlaceholderString:
-     [@([[[NSApp delegate] userAgent] transportPort]) stringValue]];
+     [[NSNumber numberWithUnsignedInteger:[[[NSApp delegate] userAgent] transportPort]] stringValue]];
 }
 
 @end

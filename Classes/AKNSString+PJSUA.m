@@ -14,13 +14,11 @@
 - (pj_str_t)pjString {
     return pj_str((char *)[self cStringUsingEncoding:NSUTF8StringEncoding]);
 }
-+ (NSString *)uuidString {
-	// Returns a UUID
++ (NSString *)uuidString {	// Returns a UUID
 
 	CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
 	NSString *uuidStr = (__bridge_transfer NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
 	CFRelease(uuid);
-
 	return uuidStr;
 }
 

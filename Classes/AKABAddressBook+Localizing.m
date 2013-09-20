@@ -10,8 +10,7 @@
 
 - (NSString *)ak_localizedLabel:(NSString *)label {
     NSString *theString;
-    
-    if ([label isEqualToString:kABPhoneWorkLabel]) {
+	if ([label isEqualToString:kABPhoneWorkLabel]) {
         theString = NSLocalizedStringFromTable(@"work", @"AddressBookLabels", @"Work phone number.");
     } else if ([label isEqualToString:kABPhoneHomeLabel]) {
         theString = NSLocalizedStringFromTable(@"home", @"AddressBookLabels", @"Home phone number.");
@@ -30,8 +29,8 @@
     } else if ([label isEqualToString:@"sip"]) {
         theString = NSLocalizedStringFromTable(@"sip", @"AddressBookLabels", @"SIP address.");
     } else {
-        CFStringRef localizedLabel = ABCopyLocalizedPropertyOrLabel((CFStringRef)label);
-        theString = [(NSString *)localizedLabel autorelease];
+	        CFStringRef localizedLabel = ABCopyLocalizedPropertyOrLabel((__bridge CFStringRef)label);
+	        theString = (__bridge_transfer NSString *)localizedLabel;
     }
 	return theString;
 }

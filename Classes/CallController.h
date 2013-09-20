@@ -7,7 +7,6 @@
 #import "XSWindowController.h"
 
 // Notifications.
-//
 // Sent when call window is about to be closed.
 // |accountController| will be subscribed to this notification in its setter.
 extern NSString * const AKCallWindowWillCloseNotification;

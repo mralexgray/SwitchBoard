@@ -31,19 +31,16 @@
 #import "PreferencesController.h"
 
 // Account state pop-up button widths.
-//
 // English.
 static const CGFloat kAccountStatePopUpOfflineEnglishWidth = 58.0;
 static const CGFloat kAccountStatePopUpAvailableEnglishWidth = 69.0;
 static const CGFloat kAccountStatePopUpUnavailableEnglishWidth = 81.0;
 static const CGFloat kAccountStatePopUpConnectingEnglishWidth = 90.0;
-//
 // Russian.
 static const CGFloat kAccountStatePopUpOfflineRussianWidth = 65.0;
 static const CGFloat kAccountStatePopUpAvailableRussianWidth = 73.0;
 static const CGFloat kAccountStatePopUpUnavailableRussianWidth = 85.0;
 static const CGFloat kAccountStatePopUpConnectingRussianWidth = 96.0;
-//
 // German.
 static const CGFloat kAccountStatePopUpOfflineGermanWidth = 58.0;
 static const CGFloat kAccountStatePopUpAvailableGermanWidth = 74.0;
@@ -69,10 +66,8 @@ NSString * const kEmailSIPLabel = @"sip";
 
 - (void)setEnabled:(BOOL)flag {
     _enabled = flag;
-    
-    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-    
-    if (flag) {
+	NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+	if (flag) {
         AKNetworkReachability *reachability
             = [AKNetworkReachability networkReachabilityWithHost:[[self account] registrar]];
         [self setRegistrarReachability:reachability];
@@ -101,8 +96,7 @@ NSString * const kEmailSIPLabel = @"sip";
         [[self reRegistrationTimer] invalidate];
         [self setReRegistrationTimer:nil];
     }
-    
-    if ([[self account] identifier] != kAKSIPUserAgentInvalidIdentifier) {
+	if ([[self account] identifier] != kAKSIPUserAgentInvalidIdentifier) {
         // Account has been added.
         [self showConnectingState];
         
@@ -183,22 +177,17 @@ NSString * const kEmailSIPLabel = @"sip";
     if (self == nil) {
         return nil;
     }
-    
-    [self setAccount:anAccount];
+	[self setAccount:anAccount];
     _callControllers = [[NSMutableArray alloc] init];
     [self setSubstitutesPlusCharacter:NO];
-    
-    [self setAttemptingToRegisterAccount:NO];
+	[self setAttemptingToRegisterAccount:NO];
     [self setAttemptingToUnregisterAccount:NO];
     [self setShouldPresentRegistrationError:NO];
     [self setAccountUnavailable:NO];
     [self setShouldMakeCall:NO];
-    
-    [[self account] setDelegate:self];
-    
-    [[self window] setTitle:[[self account] SIPAddress]];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
+	[[self account] setDelegate:self];
+	[[self window] setTitle:[[self account] SIPAddress]];
+	[[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(SIPUserAgentDidFinishStarting:)
                                                  name:AKSIPUserAgentDidFinishStartingNotification
                                                object:nil];
@@ -221,17 +210,13 @@ NSString * const kEmailSIPLabel = @"sip";
     for (CallController *aCallController in [self callControllers]) {
         [aCallController close];
     }
-    
-    if ([[[self account] delegate] isEqual:self]) {
+	if ([[[self account] delegate] isEqual:self]) {
         [[self account] setDelegate:nil];
     }
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
-    // Close authentication failure sheet if it's raised.
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	// Close authentication failure sheet if it's raised.
     [[_authenticationFailureController cancelButton] performClick:nil];
-    
-    
+	
     
     
 }
@@ -244,13 +229,11 @@ NSString * const kEmailSIPLabel = @"sip";
 }
 - (void)removeAccountFromUserAgent {
     NSAssert([self isEnabled], @"Account conroller must be enabled to remove account from the user agent.");
-    
-    if ([self reRegistrationTimer] != nil) {
+	if ([self reRegistrationTimer] != nil) {
         [[self reRegistrationTimer] invalidate];
         [self setReRegistrationTimer:nil];
     }
-    
-    [self showOfflineState];
+	[self showOfflineState];
     [[[NSApp delegate] userAgent] removeAccount:[self account]];
 }
 - (void)makeCallToURI:(AKSIPURI *)destinationURI
@@ -261,15 +244,12 @@ NSString * const kEmailSIPLabel = @"sip";
     AKTelephoneNumberFormatter *telephoneNumberFormatter = [[AKTelephoneNumberFormatter alloc] init];
     [telephoneNumberFormatter setSplitsLastFourDigits:
      [defaults boolForKey:kTelephoneNumberFormatterSplitsLastFourDigits]];
-    
-    NSString *enteredCallDestinationString = [[destinationURI user] copy];
-    
-    // Make user part a string of contiguous digits if needed.
+	NSString *enteredCallDestinationString = [[destinationURI user] copy];
+	// Make user part a string of contiguous digits if needed.
     if (![[destinationURI user] ak_hasLetters]) {
         [destinationURI setUser:[telephoneNumberFormatter telephoneNumberFromString:[destinationURI user]]];
     }
-    
-    // Replace plus character if needed.
+	// Replace plus character if needed.
     if ([self substitutesPlusCharacter] &&
         [[destinationURI user] hasPrefix:@"+"]) {
         [destinationURI setUser:[[destinationURI user]
@@ -279,21 +259,18 @@ NSString * const kEmailSIPLabel = @"sip";
                                         stringByReplacingCharactersInRange:NSMakeRange(0, 1)
                                                                 withString:[self plusCharacterSubstitution]];
     }
-    
-    // If it's a regular call, not a transfer, create the new CallController.
+	// If it's a regular call, not a transfer, create the new CallController.
     CallController *aCallController;
     if (callTransferController == nil) {
         aCallController = [[CallController alloc] initWithWindowNibName:@"Call" accountController:self];
     } else {
         aCallController = callTransferController;
     }
-    
-    [aCallController setNameFromAddressBook:[destinationURI displayName]];
+	[aCallController setNameFromAddressBook:[destinationURI displayName]];
     [aCallController setPhoneLabelFromAddressBook:phoneLabel];
     [aCallController setEnteredCallDestination:enteredCallDestinationString];
     [[self callControllers] addObject:aCallController];
-    
-    // Set title.
+	// Set title.
     if ([[destinationURI host] length] > 0) {
         [[aCallController window] setTitle:[destinationURI SIPAddress]];
         
@@ -309,8 +286,7 @@ NSString * const kEmailSIPLabel = @"sip";
                                 [destinationURI user], [[[self account] registrationURI] host]];
         [[aCallController window] setTitle:SIPAddress];
     }
-    
-    // Set displayed name.
+	// Set displayed name.
     if ([[destinationURI displayName] length] > 0) {
         [aCallController setDisplayedName:[destinationURI displayName]];
         
@@ -328,24 +304,19 @@ NSString * const kEmailSIPLabel = @"sip";
             [aCallController setDisplayedName:enteredCallDestinationString];
         }
     }
-    
-    // Clean display-name part of the destination URI to prevent another call
+	// Clean display-name part of the destination URI to prevent another call
     // party from seeing local Address Book records.
     [destinationURI setDisplayName:nil];
-    
-    if ([[destinationURI host] length] == 0) {
+	if ([[destinationURI host] length] == 0) {
         [destinationURI setHost:[[[self account] registrationURI] host]];
     }
-    
-    // Set URI for redial.
+	// Set URI for redial.
     [aCallController setRedialURI:destinationURI];
-    
-    if (callTransferController == nil) {
+	if (callTransferController == nil) {
         [aCallController addViewController:[aCallController activeCallViewController]];
         [[aCallController window] setContentView:[[aCallController activeCallViewController] view]];
     }
-    
-    if ([phoneLabel length] > 0) {
+	if ([phoneLabel length] > 0) {
         [aCallController setStatus:
          [NSString stringWithFormat:NSLocalizedString(@"calling %@...",
                                                       @"Outgoing call in progress. Calling specific phone "
@@ -353,12 +324,10 @@ NSString * const kEmailSIPLabel = @"sip";
     } else {
         [aCallController setStatus:NSLocalizedString(@"calling...", @"Outgoing call in progress.")];
     }
-    
-    if (callTransferController == nil) {
+	if (callTransferController == nil) {
         [aCallController showWindow:self];
     }
-    
-    // Finally, make a call.
+	// Finally, make a call.
     AKSIPCall *aCall = [[self account] makeCallTo:destinationURI];
     if (aCall != nil) {
         [aCallController setCall:aCall];
@@ -378,10 +347,8 @@ NSString * const kEmailSIPLabel = @"sip";
         [[self reRegistrationTimer] invalidate];
         [self setReRegistrationTimer:nil];
     }
-    
-    NSInteger selectedItemTag = [[sender selectedItem] tag];
-    
-    if (selectedItemTag == kSIPAccountOffline) {
+	NSInteger selectedItemTag = [[sender selectedItem] tag];
+	if (selectedItemTag == kSIPAccountOffline) {
         [self setAccountUnavailable:NO];
         [self removeAccountFromUserAgent];
         
@@ -407,8 +374,7 @@ NSString * const kEmailSIPLabel = @"sip";
     [alert setMessageText:[NSString stringWithFormat:
                            NSLocalizedString(@"Could not register with %@.", @"Registrar connection error."),
                            [[self account] registrar]]];
-    
-    if (error == nil) {
+	if (error == nil) {
         [alert setInformativeText:
          [NSString stringWithFormat:
           NSLocalizedString(@"Please check network connection and Registry Server settings.",
@@ -417,29 +383,23 @@ NSString * const kEmailSIPLabel = @"sip";
     } else {
         [alert setInformativeText:error];
     }
-    
-    [alert beginSheetModalForWindow:[self window] modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
+	[alert beginSheetModalForWindow:[self window] modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
 }
 - (void)showAvailableState {
     NSSize buttonSize = [[self accountStatePopUp] frame].size;
-    
-    NSString *preferredLocalization = [[NSBundle mainBundle] preferredLocalizations][0];
-    
-    if ([preferredLocalization isEqualToString:@"English"]) {
+	NSString *preferredLocalization = [[NSBundle mainBundle] preferredLocalizations][0];
+	if ([preferredLocalization isEqualToString:@"English"]) {
         buttonSize.width = kAccountStatePopUpAvailableEnglishWidth;
     } else if ([preferredLocalization isEqualToString:@"Russian"]) {
         buttonSize.width = kAccountStatePopUpAvailableRussianWidth;
     } else if ([preferredLocalization isEqualToString:@"German"]) {
         buttonSize.width = kAccountStatePopUpAvailableGermanWidth;
     }
-    
-    [[self accountStatePopUp] setFrameSize:buttonSize];
+	[[self accountStatePopUp] setFrameSize:buttonSize];
     [[self accountStatePopUp] setTitle:NSLocalizedString(@"Available", @"Account registration Available menu item.")];
-    
-    [[[[self accountStatePopUp] menu] itemWithTag:kSIPAccountAvailable] setState:NSOnState];
+	[[[[self accountStatePopUp] menu] itemWithTag:kSIPAccountAvailable] setState:NSOnState];
     [[[[self accountStatePopUp] menu] itemWithTag:kSIPAccountUnavailable] setState:NSOffState];
-    
-    if ([self countOfViewControllers] == 0) {
+	if ([self countOfViewControllers] == 0) {
         [self addViewController:[self activeAccountViewController]];
         [[self window] setContentView:[[self activeAccountViewController] view]];
         
@@ -450,25 +410,20 @@ NSString * const kEmailSIPLabel = @"sip";
 }
 - (void)showUnavailableState {
     NSSize buttonSize = [[self accountStatePopUp] frame].size;
-    
-    NSString *preferredLocalization = [[NSBundle mainBundle] preferredLocalizations][0];
-    
-    if ([preferredLocalization isEqualToString:@"English"]) {
+	NSString *preferredLocalization = [[NSBundle mainBundle] preferredLocalizations][0];
+	if ([preferredLocalization isEqualToString:@"English"]) {
         buttonSize.width = kAccountStatePopUpUnavailableEnglishWidth;
     } else if ([preferredLocalization isEqualToString:@"Russian"]) {
         buttonSize.width = kAccountStatePopUpUnavailableRussianWidth;
     } else if ([preferredLocalization isEqualToString:@"German"]) {
         buttonSize.width = kAccountStatePopUpUnavailableGermanWidth;
     }
-    
-    [[self accountStatePopUp] setFrameSize:buttonSize];
+	[[self accountStatePopUp] setFrameSize:buttonSize];
     [[self accountStatePopUp] setTitle:
      NSLocalizedString(@"Unavailable", @"Account registration Unavailable menu item.")];
-    
-    [[[[self accountStatePopUp] menu] itemWithTag:kSIPAccountAvailable] setState:NSOffState];
+	[[[[self accountStatePopUp] menu] itemWithTag:kSIPAccountAvailable] setState:NSOffState];
     [[[[self accountStatePopUp] menu] itemWithTag:kSIPAccountUnavailable] setState:NSOnState];
-    
-    if ([self countOfViewControllers] == 0) {
+	if ([self countOfViewControllers] == 0) {
         [self addViewController:[self activeAccountViewController]];
         [[self window] setContentView:[[self activeAccountViewController] view]];
         
@@ -479,24 +434,19 @@ NSString * const kEmailSIPLabel = @"sip";
 }
 - (void)showOfflineState {
     NSSize buttonSize = [[self accountStatePopUp] frame].size;
-    
-    NSString *preferredLocalization = [[NSBundle mainBundle] preferredLocalizations][0];
-    
-    if ([preferredLocalization isEqualToString:@"English"]) {
+	NSString *preferredLocalization = [[NSBundle mainBundle] preferredLocalizations][0];
+	if ([preferredLocalization isEqualToString:@"English"]) {
         buttonSize.width = kAccountStatePopUpOfflineEnglishWidth;
     } else if ([preferredLocalization isEqualToString:@"Russian"]) {
         buttonSize.width = kAccountStatePopUpOfflineRussianWidth;
     } else if ([preferredLocalization isEqualToString:@"German"]) {
         buttonSize.width = kAccountStatePopUpOfflineGermanWidth;
     }
-    
-    [[self accountStatePopUp] setFrameSize:buttonSize];
+	[[self accountStatePopUp] setFrameSize:buttonSize];
     [[self accountStatePopUp] setTitle:NSLocalizedString(@"Offline", @"Account registration Offline menu item.")];
-    
-    [[[[self accountStatePopUp] menu] itemWithTag:kSIPAccountAvailable] setState:NSOffState];
+	[[[[self accountStatePopUp] menu] itemWithTag:kSIPAccountAvailable] setState:NSOffState];
     [[[[self accountStatePopUp] menu] itemWithTag:kSIPAccountUnavailable] setState:NSOffState];
-    
-    [self removeViewController:[self activeAccountViewController]];
+	[self removeViewController:[self activeAccountViewController]];
     NSRect frame = [[[self window] contentView] frame];
     NSView *emptyView = [[NSView alloc] initWithFrame:frame];
     NSUInteger autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
@@ -505,18 +455,15 @@ NSString * const kEmailSIPLabel = @"sip";
 }
 - (void)showConnectingState {
     NSSize buttonSize = [[self accountStatePopUp] frame].size;
-    
-    NSString *preferredLocalization = [[NSBundle mainBundle] preferredLocalizations][0];
-    
-    if ([preferredLocalization isEqualToString:@"English"]) {
+	NSString *preferredLocalization = [[NSBundle mainBundle] preferredLocalizations][0];
+	if ([preferredLocalization isEqualToString:@"English"]) {
         buttonSize.width = kAccountStatePopUpConnectingEnglishWidth;
     } else if ([preferredLocalization isEqualToString:@"Russian"]) {
         buttonSize.width = kAccountStatePopUpConnectingRussianWidth;
     } else if ([preferredLocalization isEqualToString:@"German"]) {
         buttonSize.width = kAccountStatePopUpConnectingGermanWidth;
     }
-    
-    [[self accountStatePopUp] setFrameSize:buttonSize];
+	[[self accountStatePopUp] setFrameSize:buttonSize];
     [[self accountStatePopUp] setTitle:
      NSLocalizedString(@"Connecting...", @"Account registration Connecting... menu item.")];
 }
@@ -525,45 +472,36 @@ NSString * const kEmailSIPLabel = @"sip";
 }
 - (void)handleCatchedURL {
     AKSIPURI *uri = [AKSIPURI SIPURIWithString:[self catchedURLString]];
-    
-    [self setCatchedURLString:nil];
-    
-    if ([[uri user] length] == 0) {
+	[self setCatchedURLString:nil];
+	if ([[uri user] length] == 0) {
         return;
     }
-    
-    [[[self activeAccountViewController] callDestinationField] setTokenStyle:NSPlainTextTokenStyle];
-    
-    NSString *theString;
+	[[[self activeAccountViewController] callDestinationField] setTokenStyle:NSPlainTextTokenStyle];
+	NSString *theString;
     if ([[uri host] length] > 0) {
         theString = [uri SIPAddress];
     } else {
         theString = [uri user];
     }
-    
-    [[[self activeAccountViewController] callDestinationField] setStringValue:theString];
-    
-    [[self activeAccountViewController] makeCall:nil];
+	[[[self activeAccountViewController] callDestinationField] setStringValue:theString];
+	[[self activeAccountViewController] makeCall:nil];
 }
 
-#pragma mark -
-#pragma mark NSWindow delegate methods
+#pragma mark - NSWindow delegate methods
 
 - (void)windowDidLoad {
     [self showOfflineState];
 }
 - (BOOL)windowShouldClose:(id)sender {
     BOOL result = YES;
-    
-    if (sender == [self window]) {
+	if (sender == [self window]) {
         [[self window] orderOut:self];
         result = NO;
     }
 	return result;
 }
 
-#pragma mark -
-#pragma mark AKSIPAccount notifications
+#pragma mark - AKSIPAccount notifications
 
 // When account registration changes, make appropriate modifications to the UI. A call can also be made from here if
 // the user called from the Address Book or from the application URL handler.
@@ -573,8 +511,7 @@ NSString * const kEmailSIPLabel = @"sip";
     if ([[self account] identifier] == kAKSIPUserAgentInvalidIdentifier) {
         return;
     }
-    
-    if ([[self account] isRegistered]) {
+	if ([[self account] isRegistered]) {
         if ([self reRegistrationTimer] != nil) {
             [[self reRegistrationTimer] invalidate];
             [self setReRegistrationTimer:nil];
@@ -677,8 +614,7 @@ NSString * const kEmailSIPLabel = @"sip";
             }
         }
     }
-    
-    [self setAttemptingToRegisterAccount:NO];
+	[self setAttemptingToRegisterAccount:NO];
     [self setAttemptingToUnregisterAccount:NO];
     [self setShouldPresentRegistrationError:NO];
 }
@@ -689,16 +625,14 @@ NSString * const kEmailSIPLabel = @"sip";
     }
 }
 
-#pragma mark -
-#pragma mark CallController notifications
+#pragma mark - CallController notifications
 
 - (void)callWindowWillClose:(NSNotification *)notification {
     CallController *aCallController = [notification object];
     [[self callControllers] removeObject:aCallController];
 }
 
-#pragma mark -
-#pragma mark AKSIPAccountDelegate protocol
+#pragma mark - AKSIPAccountDelegate protocol
 
 - (void)SIPAccountDidReceiveCall:(AKSIPCall *)aCall {
     if ([self isAccountUnavailable]) {
@@ -717,23 +651,18 @@ NSString * const kEmailSIPLabel = @"sip";
             }
         }
     }
-    
-    [[NSApp delegate] pauseITunes];
-    
-    CallController *aCallController = [[CallController alloc] initWithWindowNibName:@"Call" accountController:self];
-    
-    [aCallController setCall:aCall];
+	[[NSApp delegate] pauseITunes];
+	CallController *aCallController = [[CallController alloc] initWithWindowNibName:@"Call" accountController:self];
+	[aCallController setCall:aCall];
     [aCallController setCallActive:YES];
     [aCallController setCallUnhandled:YES];
     [[self callControllers] addObject:aCallController];
-    
-    AKSIPURIFormatter *SIPURIFormatter = [[AKSIPURIFormatter alloc] init];
+	AKSIPURIFormatter *SIPURIFormatter = [[AKSIPURIFormatter alloc] init];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [SIPURIFormatter setFormatsTelephoneNumbers:[defaults boolForKey:kFormatTelephoneNumbers]];
     [SIPURIFormatter setTelephoneNumberFormatterSplitsLastFourDigits:
      [defaults boolForKey:kTelephoneNumberFormatterSplitsLastFourDigits]];
-    
-    // These variables will be changed during the Address Book search if the record is found.
+	// These variables will be changed during the Address Book search if the record is found.
     NSString *finalTitle = [[aCall remoteURI] SIPAddress];
     NSString *finalDisplayedName = [SIPURIFormatter stringForObjectValue:[aCall remoteURI]];
     NSString *finalStatus = NSLocalizedString(@"calling",
@@ -741,22 +670,18 @@ NSString * const kEmailSIPLabel = @"sip";
                                                "now. Call status string. Deliberately in lower case, "
                                                "translators should do the same, if possible.");
     AKSIPURI *finalRedialURI = [aCall remoteURI];
-    
-    // Search Address Book for caller's name.
+	// Search Address Book for caller's name.
     
     ABAddressBook *AB = [ABAddressBook sharedAddressBook];
     NSArray *records = nil;
-    
-    ABSearchElement *SIPAddressMatch
+	ABSearchElement *SIPAddressMatch
         = [ABPerson searchElementForProperty:kABEmailProperty
                                        label:nil
                                          key:nil
                                        value:[[aCall  remoteURI] SIPAddress]
                                   comparison:kABEqualCaseInsensitive];
-    
-    records = [AB recordsMatchingSearchElement:SIPAddressMatch];
-    
-    if ([records count] > 0) {
+	records = [AB recordsMatchingSearchElement:SIPAddressMatch];
+	if ([records count] > 0) {
         id theRecord = records[0];
         
         finalDisplayedName = [theRecord ak_fullName];
@@ -908,20 +833,16 @@ NSString * const kEmailSIPLabel = @"sip";
             }
         }
     }
-    
-    // Address Book search ends here.
+	// Address Book search ends here.
     
     [[aCallController window] setTitle:finalTitle];
     [aCallController setDisplayedName:finalDisplayedName];
     [aCallController setStatus:finalStatus];
     [aCallController setRedialURI:finalRedialURI];
-    
-    [aCallController addViewController:[aCallController incomingCallViewController]];
+	[aCallController addViewController:[aCallController incomingCallViewController]];
     [[aCallController window] ak_resizeAndSwapToContentView:[[aCallController incomingCallViewController] view]];
-    
-    [aCallController showWindow:nil];
-    
-    // Show Growl notification.
+	[aCallController showWindow:nil];
+	// Show Growl notification.
     NSString *callSource;
     AKTelephoneNumberFormatter *telephoneNumberFormatter = [[AKTelephoneNumberFormatter alloc] init];
     [telephoneNumberFormatter setSplitsLastFourDigits:
@@ -941,8 +862,7 @@ NSString * const kEmailSIPLabel = @"sip";
     } else {
         callSource = [[aCall remoteURI] host];
     }
-    
-    NSString *notificationTitle, *notificationDescription;
+	NSString *notificationTitle, *notificationDescription;
     if ([[aCallController nameFromAddressBook] length] > 0) {
         notificationTitle = [aCallController nameFromAddressBook];
         notificationDescription = callSource;
@@ -967,28 +887,23 @@ NSString * const kEmailSIPLabel = @"sip";
                                  "Deliberately in lower case, translators should do "
                                  "the same, if possible.");
     }
-    
-    [GrowlApplicationBridge notifyWithTitle:notificationTitle
+	[GrowlApplicationBridge notifyWithTitle:notificationTitle
                                 description:notificationDescription
                            notificationName:kGrowlNotificationIncomingCall
                                    iconData:nil
                                    priority:0
                                    isSticky:NO
                                clickContext:[aCallController identifier]];
-    
-    [[[NSApp delegate] ringtone] play];
+	[[[NSApp delegate] ringtone] play];
     [[NSApp delegate] startRingtoneTimer];
-    
-    if (![NSApp isActive]) {
+	if (![NSApp isActive]) {
         [NSApp requestUserAttention:NSInformationalRequest];
         [[NSApp delegate] startUserAttentionTimer];
     }
-    
-    [aCall sendRingingNotification];
+	[aCall sendRingingNotification];
 }
 
-#pragma mark -
-#pragma mark AKSIPUserAgent notifications
+#pragma mark - AKSIPUserAgent notifications
 
 - (void)SIPUserAgentDidFinishStarting:(NSNotification *)notification {
     if (![[notification object] isStarted]) {
@@ -996,16 +911,14 @@ NSString * const kEmailSIPLabel = @"sip";
         
         return;
     }
-    
-    if ([self attemptingToRegisterAccount]) {
+	if ([self attemptingToRegisterAccount]) {
         [self setAccountRegistered:YES];
     } else if ([self attemptingToUnregisterAccount]) {
         [self setAccountRegistered:NO];
     }
 }
 
-#pragma mark -
-#pragma mark AKNetworkReachability notifications
+#pragma mark - AKNetworkReachability notifications
 
 // This is the moment when the application starts doing its main job.
 - (void)networkReachabilityDidBecomeReachable:(NSNotification *)notification {

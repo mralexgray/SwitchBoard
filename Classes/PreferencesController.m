@@ -75,13 +75,10 @@ NSString * const AKPreferencesControllerDidChangeNetworkSettingsNotification
     if (_delegate == aDelegate) {
         return;
     }
-    
-    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-    
-    if (_delegate != nil)
+	NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+	if (_delegate != nil)
         [nc removeObserver:_delegate name:nil object:self];
-    
-    if (aDelegate != nil) {
+	if (aDelegate != nil) {
         if ([aDelegate respondsToSelector:@selector(preferencesControllerDidRemoveAccount:)]) {
             [nc addObserver:aDelegate
                    selector:@selector(preferencesControllerDidRemoveAccount:)
@@ -110,8 +107,7 @@ NSString * const AKPreferencesControllerDidChangeNetworkSettingsNotification
                      object:self];
         }
     }
-    
-    _delegate = aDelegate;
+	_delegate = aDelegate;
 }
 - (GeneralPreferencesViewController *)generalPreferencesViewController {
     if (_generalPreferencesViewController == nil) {
@@ -145,8 +141,7 @@ NSString * const AKPreferencesControllerDidChangeNetworkSettingsNotification
 }
 - (void)dealloc {
     [self setDelegate:nil];
-    
-    
+	
 }
 - (void)awakeFromNib {
     
@@ -160,18 +155,15 @@ NSString * const AKPreferencesControllerDidChangeNetworkSettingsNotification
     // If the user switches from Network to some other view, check for network settings changes.
     NSView *contentView = [[self window] contentView];
     NSView *networkPreferencesView = [[self networkPreferencesViewController] view];
-    
-    if ([contentView isEqual:networkPreferencesView] && [sender tag] != kNetworkPreferencesTag) {
+	if ([contentView isEqual:networkPreferencesView] && [sender tag] != kNetworkPreferencesTag) {
         if ([[self networkPreferencesViewController] checkForNetworkSettingsChanges:sender]) {
             return;
         }
     }
-    
-    NSView *view;
+	NSView *view;
     NSString *title;
     NSView *firstResponderView;
-    
-    switch ([sender tag]) {
+	switch ([sender tag]) {
         case kGeneralPreferencesTag:
             view = [[self generalPreferencesViewController] view];
             title = [[self generalPreferencesViewController] title];
@@ -198,16 +190,14 @@ NSString * const AKPreferencesControllerDidChangeNetworkSettingsNotification
             firstResponderView = nil;
             break;
     }
-    
-    [[self window] ak_resizeAndSwapToContentView:view animate:YES];
+	[[self window] ak_resizeAndSwapToContentView:view animate:YES];
     [[self window] setTitle:title];
     if ([firstResponderView acceptsFirstResponder]) {
         [[self window] makeFirstResponder:firstResponderView];
     }
 }
 
-#pragma mark -
-#pragma mark NSToolbar delegate
+#pragma mark - NSToolbar delegate
 
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)aToolbar {
     return @[[[self generalToolbarItem] itemIdentifier],
@@ -216,8 +206,7 @@ NSString * const AKPreferencesControllerDidChangeNetworkSettingsNotification
             [[self networkToolbarItem] itemIdentifier]];
 }
 
-#pragma mark -
-#pragma mark NSWindow delegate
+#pragma mark - NSWindow delegate
 
 - (BOOL)windowShouldClose:(id)window {
     if (_networkPreferencesViewController != nil) {

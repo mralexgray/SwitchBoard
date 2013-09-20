@@ -35,8 +35,7 @@
     if (self == nil) {
         return nil;
     }
-    
-    [self setDisplayName:aDisplayName];
+	[self setDisplayName:aDisplayName];
     [self setUser:aUser];
     [self setHost:aHost];
 	return self;
@@ -49,8 +48,7 @@
     if (self == nil) {
         return nil;
     }
-    
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF MATCHES '.+\\\\s<sip:(.+@)?.+>'"];
+	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF MATCHES '.+\\\\s<sip:(.+@)?.+>'"];
     if ([predicate evaluateWithObject:SIPURIString]) {
         NSRange delimiterRange = [SIPURIString rangeOfString:@" <"];
         
@@ -74,25 +72,20 @@
         
         return self;
     }
-    
-    if (![[AKSIPUserAgent sharedUserAgent] isStarted]) {
+	if (![[AKSIPUserAgent sharedUserAgent] isStarted]) {
         return nil;
     }
-    
-    pjsip_name_addr *nameAddr;
+	pjsip_name_addr *nameAddr;
     nameAddr = (pjsip_name_addr *)pjsip_parse_uri([[AKSIPUserAgent sharedUserAgent] pjPool],
                                                   (char *)[SIPURIString cStringUsingEncoding:NSUTF8StringEncoding],
                                                   [SIPURIString length], PJSIP_PARSE_URI_AS_NAMEADDR);
     if (nameAddr == NULL) {
         return nil;
     }
-    
-    [self setDisplayName:[NSString stringWithPJString:nameAddr->display]];
-    
-    pj_str_t *schemePJString = (pj_str_t *)pjsip_uri_get_scheme(nameAddr);
+	[self setDisplayName:[NSString stringWithPJString:nameAddr->display]];
+	pj_str_t *schemePJString = (pj_str_t *)pjsip_uri_get_scheme(nameAddr);
     NSString *scheme = [NSString stringWithPJString:*schemePJString];
-    
-    if ([scheme isEqualToString:@"sip"] || [scheme isEqualToString:@"sips"]) {
+	if ([scheme isEqualToString:@"sip"] || [scheme isEqualToString:@"sips"]) {
         pjsip_sip_uri *uri = (pjsip_sip_uri *)pjsip_uri_get_uri(nameAddr);
         
         [self setUser:[NSString stringWithPJString:uri->user]];
@@ -122,16 +115,14 @@
     if ([self port] > 0) {
         SIPAddressWithPort = [SIPAddressWithPort stringByAppendingFormat:@":%ld", [self port]];
     }
-    
-    if ([[self displayName] length] > 0) {
+	if ([[self displayName] length] > 0) {
         return [NSString stringWithFormat:@"\"%@\" <sip:%@>", [self displayName], SIPAddressWithPort];
     } else {
         return [NSString stringWithFormat:@"<sip:%@>", SIPAddressWithPort];
     }
 }
 
-#pragma mark -
-#pragma mark NSCopying protocol
+#pragma mark - NSCopying protocol
 
 - (id)copyWithZone:(NSZone *)zone {
   AKSIPURI *newURI = [[AKSIPURI allocWithZone:zone] initWithUser:[self user]

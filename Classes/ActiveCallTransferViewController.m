@@ -12,8 +12,7 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    
-    [[[self displayedNameField] cell] setBackgroundStyle:NSBackgroundStyleLight];
+	[[[self displayedNameField] cell] setBackgroundStyle:NSBackgroundStyleLight];
     [[[self statusField] cell] setBackgroundStyle:NSBackgroundStyleLight];
 }
 - (IBAction)transferCall:(id)sender {
@@ -26,8 +25,7 @@
     // Do nothing.
 }
 
-#pragma mark -
-#pragma mark NSMenuValidation protocol
+#pragma mark - NSMenuValidation protocol
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
     if ([menuItem action] == @selector(showCallTransferSheet:)) {

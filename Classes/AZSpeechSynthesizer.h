@@ -1,7 +1,6 @@
 //
 //  AZSpeechSynthesizer.h
 //  Telephone
-//
 //  Created by Alex Gray on 04/03/2013.
 //
 //

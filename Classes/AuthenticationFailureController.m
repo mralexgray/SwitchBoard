@@ -31,12 +31,10 @@ NSString * const AKAuthenticationFailureControllerDidChangeUsernameAndPasswordNo
      [NSString stringWithFormat:
       NSLocalizedString(@"Telephone was unable to login to %@. Change user name or password and try again.",
                         @"Registrar authentication failed."), registrar]];
-    
-    NSString *username = [[[self accountController] account] username];
+	NSString *username = [[[self accountController] account] username];
     NSString *serviceName = [NSString stringWithFormat:@"SIP: %@", [[[self accountController] account] registrar]];
     NSString *password = [AKKeychain passwordForServiceName:serviceName accountName:username];
-    
-    [[self usernameField] setStringValue:username];
+	[[self usernameField] setStringValue:username];
     [[self passwordField] setStringValue:password];
 }
 - (IBAction)closeSheet:(id)sender {
@@ -45,11 +43,9 @@ NSString * const AKAuthenticationFailureControllerDidChangeUsernameAndPasswordNo
 }
 - (IBAction)changeUsernameAndPassword:(id)sender {
     [self closeSheet:sender];
-    
-    NSCharacterSet *spacesSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+	NSCharacterSet *spacesSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     NSString *username = [[[self usernameField] stringValue] stringByTrimmingCharactersInSet:spacesSet];
-    
-    if ([username length] > 0) {
+	if ([username length] > 0) {
         [[self accountController] removeAccountFromUserAgent];
         [[[self accountController] account] setUsername:username];
         
@@ -99,8 +95,7 @@ NSString * const AKAuthenticationFailureControllerDidChangeUsernameAndPasswordNo
          postNotificationName:AKAuthenticationFailureControllerDidChangeUsernameAndPasswordNotification
                        object:self];
     }
-    
-    [[self passwordField] setStringValue:@""];
+	[[self passwordField] setStringValue:@""];
 }
 
 @end

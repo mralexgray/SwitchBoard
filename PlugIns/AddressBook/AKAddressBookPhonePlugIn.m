@@ -13,12 +13,9 @@
     if (self == nil) {
         return nil;
     }
-    
-    [self setShouldDial:NO];
-    
-    NSNotificationCenter *notificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
-    
-    [notificationCenter addObserver:self
+	[self setShouldDial:NO];
+	NSNotificationCenter *notificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
+	[notificationCenter addObserver:self
                            selector:@selector(workspaceDidLaunchApplication:)
                                name:NSWorkspaceDidLaunchApplicationNotification
                              object:nil];
@@ -27,8 +24,7 @@
 - (void)dealloc {
     [_lastPhoneNumber release];
     [_lastFullName release];
-    
-    [super dealloc];
+	[super dealloc];
 }
 
 // This plug-in handles phone numbers.
@@ -44,12 +40,10 @@
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"bundleIdentifier == 'com.tlphn.Telephone'"];
     applications = [applications filteredArrayUsingPredicate:predicate];
     BOOL isTelephoneLaunched = [applications count] > 0;
-    
-    ABMultiValue *phones = [person valueForProperty:[self actionProperty]];
+	ABMultiValue *phones = [person valueForProperty:[self actionProperty]];
     NSString *phoneNumber = [phones valueForIdentifier:identifier];
     NSString *fullName = [person ak_fullName];
-    
-    if (!isTelephoneLaunched) {
+	if (!isTelephoneLaunched) {
         [[NSWorkspace sharedWorkspace] launchApplication:@"Telephone"];
         [self setShouldDial:YES];
         [self setLastPhoneNumber:phoneNumber];
@@ -73,8 +67,7 @@
 - (void)workspaceDidLaunchApplication:(NSNotification *)notification {
     NSRunningApplication *application = [[notification userInfo] objectForKey:NSWorkspaceApplicationKey];
     NSString *bundleIdentifier = [application bundleIdentifier];
-    
-    if ([bundleIdentifier isEqualToString:@"com.tlphn.Telephone"] && [self shouldDial]) {
+	if ([bundleIdentifier isEqualToString:@"com.tlphn.Telephone"] && [self shouldDial]) {
         [self setShouldDial:NO];
         
         NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:

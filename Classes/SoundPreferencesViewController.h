@@ -20,7 +20,6 @@
 - (void)updateAudioDevices;
 
 // Updates the list of available sounds for a ringtone. Sounds are being searched in the following locations.
-//
 // ~/Library/Sounds
 // /Library/Sounds
 // /Network/Library/Sounds
