@@ -34,7 +34,7 @@
 #import "XSViewController.h"
 
 @interface XSWindowController () // class continuation allows us to redeclare the property as readwrite to we can privately use the setter
-@property(nonatomic,copy) NSMutableArray *viewControllers;
+//@property(nonatomic,copy) NSMutableArray *viewControllers;
 @end
 
 @implementation XSWindowController
@@ -44,58 +44,54 @@
 {
 	if (![super initWithWindowNibName:nibName])
 		return nil;
-	self.viewControllers = [NSMutableArray array];
+	_viewControllers = [NSMutableArray array];
 	return self;
 }
-
 - (void)setViewControllers:(NSMutableArray *)newViewControllers;
 {
-	if (_viewControllers == newViewControllers)
-		return;
-	NSMutableArray *newViewControllersCopy = [newViewControllers mutableCopy];
-	[_viewControllers release];
-	_viewControllers = newViewControllersCopy;
+//	if (_viewControllers == newViewControllers)
+//		return;
+//	NSMutableArray *newViewControllersCopy = [newViewControllers mutableCopy];
+	if (_viewControllers != newViewControllers)	_viewControllers =  newViewControllers.mutableCopy;
+
 }
 
-- (void)dealloc;
-{
-	[self.viewControllers release];
-	[super dealloc];
-}
-
+//- (void)dealloc;
+//{
+//	self.viewControllers;
+//}
 - (void)windowWillClose:(NSNotification *)notification;
 {
-	[self.viewControllers makeObjectsPerformSelector:@selector(removeObservations)];
-}
 
+	[self.viewControllers enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+		if ([obj respondsToSelector:@selector(removeObservations)])
+			[obj performSelector:@selector(removeObservations)];
+	}];
+}
 - (NSUInteger)countOfViewControllers;
 {
 	return [self.viewControllers count];
 }
-
 - (XSViewController *)objectInViewControllersAtIndex:(NSUInteger)index;
 {
-	return [self.viewControllers objectAtIndex:index];
+	return (self.viewControllers)[index];
 }
-
 - (void)addViewController:(XSViewController *)viewController;
 {
-	[self.viewControllers insertObject:viewController atIndex:[self.viewControllers count]];
+	[_viewControllers addObject:viewController];
+//	[self.viewControllers insertObject:viewController atIndex:[self.viewControllers count]];
 	[self patchResponderChain];
 }
-
 - (void)insertObject:(XSViewController *)viewController inViewControllersAtIndex:(NSUInteger)index;
 {
 	[self.viewControllers insertObject:viewController atIndex:index];
 	[self patchResponderChain];
 }
-
 - (void)insertObjects:(NSArray *)viewControllers inViewControllersAtIndexes:(NSIndexSet *)indexes;
 {
 	[self.viewControllers insertObjects:viewControllers atIndexes:indexes];
 	[self patchResponderChain];
 }
-
 - (void)insertObjects:(NSArray *)viewControllers inViewControllersAtIndex:(NSUInteger)index;
 {
 	[self insertObjects:viewControllers inViewControllersAtIndexes:[NSIndexSet indexSetWithIndex:index]];
@@ -109,7 +105,6 @@
 	[self.viewControllers removeObject:viewController];
 	[self patchResponderChain];
 }
-
 - (void)removeObjectFromViewControllersAtIndex:(NSUInteger)index;
 {
 	[self.viewControllers removeObjectAtIndex:index];
@@ -128,11 +123,11 @@
 		[flatViewControllers addObject:viewController];
 		[flatViewControllers addObjectsFromArray:[viewController descendants]];
 	}
-	[self setNextResponder:[flatViewControllers objectAtIndex:0]];
+	[self setNextResponder:flatViewControllers[0]];
 	NSUInteger index = 0;
 	NSUInteger viewControllerCount = [flatViewControllers count] - 1;
 	for (index = 0; index < viewControllerCount ; index++) { // set the next responder of each controller to the next, the last in the array has no next responder.
-		[[flatViewControllers objectAtIndex:index] setNextResponder:[flatViewControllers objectAtIndex:index + 1]];
+		[flatViewControllers[index] setNextResponder:flatViewControllers[index + 1]];
 	}
 }
 

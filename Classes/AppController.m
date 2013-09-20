@@ -2,31 +2,6 @@
 //  AppController.m
 //  Telephone
 
-/**	Copyright (c) 2008-2012 Alexei Kuznetsov. All rights reserved.
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
-  1. Redistributions of source code must retain the above copyright notice,
-     this list of conditions and the following disclaimer.
-  2. Redistributions in binary form must reproduce the above copyright notice,
-     this list of conditions and the following disclaimer in the documentation
-     and/or other materials provided with the distribution.
-  3. Neither the name of the copyright holder nor the names of contributors
-     may be used to endorse or promote products derived from this software
-     without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE THE COPYRIGHT HOLDER
-  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-  OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  */
-
 #import "AppController.h"
 
 #import <CoreAudio/CoreAudio.h>
@@ -52,7 +27,6 @@
 #import "CallController.h"
 #import "PreferencesController.h"
 #import "SoundPreferencesViewController.h"
-
 
 NSString * const kAudioDeviceIdentifier = @"AudioDeviceIdentifier";
 NSString * const kAudioDeviceUID = @"AudioDeviceUID";
@@ -104,16 +78,15 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
 
 @end
 
-
 @implementation AppController
 
 @synthesize preferencesController = _preferencesController;
 @synthesize accountSetupController = _accountSetupController;
+@synthesize currentNameservers = _currentNameservers;
 
 - (NSArray *)enabledAccountControllers {
     return [[self accountControllers] filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"enabled == YES"]];
 }
-
 - (PreferencesController *)preferencesController {
     if (_preferencesController == nil) {
         _preferencesController = [[PreferencesController alloc] init];
@@ -121,18 +94,16 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     }
     return _preferencesController;
 }
-
 - (AccountSetupController *)accountSetupController {
     if (_accountSetupController == nil) {
         _accountSetupController = [[AccountSetupController alloc] init];
     }
     return _accountSetupController;
 }
-
 - (void)setRingtone:(NSSound *)aRingtone {
     if (_ringtone != aRingtone) {
-        [_ringtone release];
-        _ringtone = [aRingtone retain];
+//        [_ringtone release];
+        _ringtone = aRingtone;// retain];
         
         if ([[self audioDevices] count] > [self ringtoneOutputDeviceIndex]) {
             NSDictionary *ringtoneOutputDeviceDict
@@ -144,7 +115,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         }
     }
 }
-
 - (BOOL)hasIncomingCallControllers {
     for (AccountController *anAccountController in [self enabledAccountControllers]) {
         for (CallController *aCallController in [anAccountController callControllers]) {
@@ -157,10 +127,8 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
                 }
         }
     }
-    
-    return NO;
+	return NO;
 }
-
 - (BOOL)hasActiveCallControllers {
     for (AccountController *anAccountController in [self enabledAccountControllers]) {
         for (CallController *aCallController in [anAccountController callControllers]) {
@@ -169,30 +137,25 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
             }
         }
     }
-    
-    return NO;
+	return NO;
 }
-
 - (NSArray *)currentNameservers {
     NSBundle *mainBundle = [NSBundle mainBundle];
     NSString *bundleName = [[mainBundle infoDictionary] objectForKey:@"CFBundleName"];
     
-    SCDynamicStoreRef dynamicStore = SCDynamicStoreCreate(NULL, (CFStringRef)bundleName, NULL, NULL);
+    SCDynamicStoreRef dynamicStore = SCDynamicStoreCreate(NULL, (__bridge CFStringRef)bundleName, NULL, NULL);
     
-    CFPropertyListRef DNSSettings = SCDynamicStoreCopyValue(dynamicStore, (CFStringRef)kDynamicStoreDNSSettings);
+    CFPropertyListRef DNSSettings = SCDynamicStoreCopyValue(dynamicStore, (__bridge CFStringRef)kDynamicStoreDNSSettings);
     
     NSArray *nameservers = nil;
     if (DNSSettings != NULL) {
-        nameservers = [[(NSDictionary *)DNSSettings objectForKey:@"ServerAddresses"] retain];
-        
+        nameservers = [(__bridge NSDictionary *)DNSSettings objectForKey:@"ServerAddresses"];// retain];
         CFRelease(DNSSettings);
     }
-    
     CFRelease(dynamicStore);
-    
-    return [nameservers autorelease];
+	return 	_currentNameservers = nameservers;
+//	return nameservers autorelease];
 }
-
 - (NSUInteger)unhandledIncomingCallsCount {
     NSUInteger count = 0;
     for (AccountController *anAccountController in [self enabledAccountControllers]) {
@@ -202,8 +165,7 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
             }
         }
     }
-    
-    return count;
+	return count;
 }
 
 + (void)initialize {
@@ -246,7 +208,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [defaultsDict setObject:[NSNumber numberWithBool:YES] forKey:kCallWaiting];
         
         NSString *preferredLocalization = [[[NSBundle mainBundle] preferredLocalizations] objectAtIndex:0];
-        
         // Do not format phone numbers in German localization by default.
         if ([preferredLocalization isEqualToString:@"German"]) {
             [defaultsDict setObject:[NSNumber numberWithBool:NO] forKey:kFormatTelephoneNumbers];
@@ -266,7 +227,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         initialized = YES;
     }
 }
-
 - (id)init {
     self = [super init];
     if (self == nil) {
@@ -363,33 +323,31 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
                                                        andSelector:@selector(handleGetURLEvent:withReplyEvent:)
                                                      forEventClass:kInternetEventClass
                                                         andEventID:kAEGetURL];
-    
-    return self;
+	return self;
 }
 
-- (void)dealloc {
-    [_userAgent dealloc];
-    [_accountControllers release];
-    
-    if ([[_preferencesController delegate] isEqual:self]) {
-        [_preferencesController setDelegate:nil];
-    }
-    [_preferencesController release];
-    
-    [_audioDevices release];
-    [_ringtone release];
-    
-    [_accountsMenuItems release];
-    [_windowMenu release];
-    [_preferencesMenuItem release];
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
-    [[NSDistributedNotificationCenter defaultCenter] removeObserver:self];
-    
-    [super dealloc];
-}
-
+//- (void)dealloc {
+//    [_userAgent dealloc];
+//    [_accountControllers release];
+//    
+//    if ([[_preferencesController delegate] isEqual:self]) {
+//        [_preferencesController setDelegate:nil];
+//    }
+//    [_preferencesController release];
+//    
+//    [_audioDevices release];
+//    [_ringtone release];
+//    
+//    [_accountsMenuItems release];
+//    [_windowMenu release];
+//    [_preferencesMenuItem release];
+//    
+//    [[NSNotificationCenter defaultCenter] removeObserver:self];
+//    [[[NSWorkspace sharedWorkspace] notificationCenter] removeObserver:self];
+//    [[NSDistributedNotificationCenter defaultCenter] removeObserver:self];
+//    
+//    [super dealloc];
+//}
 - (void)stopUserAgent {
     // Force ended state for all calls and remove accounts from the user agent.
     for (AccountController *anAccountController in [self enabledAccountControllers]) {
@@ -402,7 +360,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     
     [[self userAgent] stop];
 }
-
 - (void)restartUserAgent {
     if ([[self userAgent] state] > kAKSIPUserAgentStopped) {
         [self setShouldRegisterAllAccounts:YES];
@@ -410,7 +367,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [self stopUserAgent];
     }
 }
-
 - (void)updateAudioDevices {
     OSStatus err = noErr;
     UInt32 size = 0;
@@ -430,11 +386,9 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     // Iterate over each device gathering information.
     for (NSUInteger loopCount = 0; loopCount < devicesCount; ++loopCount) {
         NSMutableDictionary *deviceDict = [NSMutableDictionary dictionary];
-        
         // Get device identifier.
         NSUInteger deviceIdentifier = devices[loopCount];
         [deviceDict setObject:[NSNumber numberWithUnsignedInteger:deviceIdentifier] forKey:kAudioDeviceIdentifier];
-        
         // Get device UID.
         CFStringRef UIDStringRef = NULL;
         size = sizeof(CFStringRef);
@@ -445,7 +399,7 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
                                      &size,
                                      &UIDStringRef);
         if ((err == noErr) && (UIDStringRef != NULL)) {
-            [deviceDict setObject:(NSString *)UIDStringRef forKey:kAudioDeviceUID];
+            [deviceDict setObject:(__bridge NSString *)UIDStringRef forKey:kAudioDeviceUID];
             CFRelease(UIDStringRef);
         }
         
@@ -459,7 +413,7 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
                                      &size,
                                      &nameStringRef);
         if ((err == noErr) && (nameStringRef != NULL)) {
-            [deviceDict setObject:(NSString *)nameStringRef forKey:kAudioDeviceName];
+            [deviceDict setObject:(__bridge NSString *)nameStringRef forKey:kAudioDeviceName];
             CFRelease(nameStringRef);
         }
         
@@ -534,7 +488,7 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     
     free(devices);
     
-    [self setAudioDevices:[[devicesArray copy] autorelease]];
+    [self setAudioDevices:devicesArray.copy];// autorelease]];
     
     // Update audio devices in the user agent.
     [[self userAgent] performSelectorOnMainThread:@selector(updateAudioDevices) withObject:nil waitUntilDone:YES];
@@ -645,11 +599,9 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     [[self ringtone] setPlaybackDeviceIdentifier:
      [[devices objectAtIndex:newRingtoneOutput] objectForKey:kAudioDeviceUID]];
 }
-
 - (void)setSelectedSoundIOToUserAgent {
     [[self userAgent] setSoundInputDevice:[self soundInputDeviceIndex] soundOutputDevice:[self soundOutputDeviceIndex]];
 }
-
 - (IBAction)showPreferencePanel:(id)sender {
     if (![[[self preferencesController] window] isVisible]) {
         [[[self preferencesController] window] center];
@@ -657,7 +609,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     
     [[self preferencesController] showWindow:nil];
 }
-
 - (IBAction)addAccountOnFirstLaunch:(id)sender {
     [[self accountSetupController] addAccount:sender];
     
@@ -667,19 +618,16 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [[[[self accountSetupController] passwordField] stringValue] length] > 0) {
         // Re-enable Preferences.
         [[self preferencesMenuItem] setAction:@selector(showPreferencePanel:)];
-        
         // Change back targets and actions of addAccountWindow buttons.
         [[[self accountSetupController] defaultButton] setTarget:[self accountSetupController]];
         [[[self accountSetupController] defaultButton] setAction:@selector(addAccount:)];
         [[[self accountSetupController] otherButton] setTarget:[self accountSetupController]];
         [[[self accountSetupController] otherButton] setAction:@selector(closeSheet:)];
-        
         // Install audio devices changes callback.
-        AudioHardwareAddPropertyListener(kAudioHardwarePropertyDevices, &AudioDevicesChanged, self);
-        
+        AudioHardwareAddPropertyListener(kAudioHardwarePropertyDevices, &AudioDevicesChanged, (__bridge void*)self);
+
         // Get available audio devices, select devices for sound input and output.
         [self updateAudioDevices];
-        
         // If we want to be in Mac App Store, we can't write to |~/Library/ Address Book Plug-Ins| any more.
         //
         // [self installAddressBookPlugIns];
@@ -688,7 +636,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [self installDNSChangesCallback];
     }
 }
-
 - (void)startRingtoneTimer {
     if ([self ringtoneTimer] != nil) {
         [[self ringtoneTimer] invalidate];
@@ -700,7 +647,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
                                                           userInfo:nil
                                                            repeats:YES]];
 }
-
 - (void)stopRingtoneTimerIfNeeded {
     if (![self hasIncomingCallControllers] && [self ringtoneTimer] != nil) {
         [[self ringtone] stop];
@@ -708,11 +654,9 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [self setRingtoneTimer:nil];
     }
 }
-
 - (void)ringtoneTimerTick:(NSTimer *)theTimer {
     [[self ringtone] play];
 }
-
 - (void)startUserAttentionTimer {
     if ([self userAttentionTimer] != nil) {
         [[self userAttentionTimer] invalidate];
@@ -724,19 +668,15 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
                                                                userInfo:nil
                                                                 repeats:YES]];
 }
-
 - (void)stopUserAttentionTimerIfNeeded {
     if (![self hasIncomingCallControllers] && [self userAttentionTimer] != nil) {
         [[self userAttentionTimer] invalidate];
         [self setUserAttentionTimer:nil];
     }
 }
-
 - (void)requestUserAttentionTick:(NSTimer *)theTimer {
     [NSApp requestUserAttention:NSInformationalRequest];
 }
-
-
 - (void)pauseITunes {
     if (![[NSUserDefaults standardUserDefaults] boolForKey:kPauseITunes]) {
         return;
@@ -753,7 +693,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [self setDidPauseITunes:YES];
     }
 }
-
 - (void)resumeITunesIfNeeded {
     if (![[NSUserDefaults standardUserDefaults] boolForKey:kPauseITunes]) {
         return;
@@ -773,7 +712,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [self setDidPauseITunes:NO];
     }
 }
-
 - (CallController *)callControllerByIdentifier:(NSString *)identifier {
     for (AccountController *anAccountController in [self enabledAccountControllers]) {
         for (CallController *aCallController in [anAccountController callControllers]) {
@@ -782,10 +720,8 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
             }
         }
     }
-    
-    return nil;
+	return nil;
 }
-
 - (void)updateAccountsMenuItems {
     // Remove old menu items.
     for (NSMenuItem *menuItem in [self accountsMenuItems]) {
@@ -797,7 +733,7 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     NSMutableArray *itemsArray = [NSMutableArray arrayWithCapacity:[enabledControllers count]];
     NSUInteger accountNumber = 1;
     for (AccountController *accountController in enabledControllers) {
-        NSMenuItem *menuItem = [[[NSMenuItem alloc] init] autorelease];
+        NSMenuItem *menuItem = NSMenuItem.new;//[[[NSMenuItem alloc] init] autorelease];
         [menuItem setRepresentedObject:accountController];
         [menuItem setAction:@selector(toggleAccountWindow:)];
         if ([[accountController accountDescription] length] > 0) {
@@ -826,7 +762,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         itemTag++;
     }
 }
-
 - (IBAction)toggleAccountWindow:(id)sender {
     AccountController *accountController = [sender representedObject];
     if ([[accountController window] isKeyWindow]) {
@@ -835,7 +770,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [[accountController window] makeKeyAndOrderFront:self];
     }
 }
-
 - (void)updateDockTileBadgeLabel {
     NSString *badgeString;
     NSUInteger badgeNumber = [self unhandledIncomingCallsCount];
@@ -847,7 +781,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     
     [[NSApp dockTile] setBadgeLabel:badgeString];
 }
-
 - (void)installAddressBookPlugIns {
     NSError *error = nil;
     BOOL installed = [self installAddressBookPlugInsAndReturnError:&error];
@@ -863,7 +796,7 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
             NSString *addressBookPlugInsInstallPath
               = [libraryPath stringByAppendingPathComponent:@"Address Book Plug-Ins"];
             
-            NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+            NSAlert *alert = NSAlert.new;//[[[NSAlert alloc] init] autorelease];
             [alert addButtonWithTitle:@"OK"];
             [alert setMessageText:NSLocalizedString(@"Could not install Address Book plug-ins.",
                                                     @"Address Book plug-ins install error, alert "
@@ -879,7 +812,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         }
     }
 }
-
 - (void)setupGrowl {
     NSString *growlPath = [[[NSBundle mainBundle] privateFrameworksPath]
                            stringByAppendingPathComponent:@"Growl.framework"];
@@ -890,16 +822,15 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         NSLog(@"Could not load Growl.framework");
     }
 }
-
 - (void)installDNSChangesCallback {
     NSString *bundleName = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
     SCDynamicStoreRef dynamicStore = SCDynamicStoreCreate(kCFAllocatorDefault,
-                                                          (CFStringRef)bundleName,
+                                                          (__bridge CFStringRef)bundleName,
                                                           &NameserversChanged,
                                                           NULL);
     
     NSArray *keys = [NSArray arrayWithObject:kDynamicStoreDNSSettings];
-    SCDynamicStoreSetNotificationKeys(dynamicStore, (CFArrayRef)keys, NULL);
+    SCDynamicStoreSetNotificationKeys(dynamicStore, (__bridge CFArrayRef)keys, NULL);
     
     CFRunLoopSourceRef runLoopSource = SCDynamicStoreCreateRunLoopSource(kCFAllocatorDefault, dynamicStore, 0);
     
@@ -907,7 +838,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     CFRelease(runLoopSource);
     CFRelease(dynamicStore);
 }
-
 - (void)createDirectoryForFileAtPath:(NSString *)path {
     NSString *directoryPath = [path stringByDeletingLastPathComponent];
     NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -925,7 +855,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         }
     }
 }
-
 - (BOOL)installAddressBookPlugInsAndReturnError:(NSError **)error {
     NSBundle *mainBundle = [NSBundle mainBundle];
     NSString *plugInsPath = [mainBundle builtInPlugInsPath];
@@ -970,7 +899,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     if (installedPhonePlugInBundle != nil) {
         NSInteger installedPhonePlugInVersion = [[[installedPhonePlugInBundle infoDictionary]
                                                   objectForKey:@"CFBundleVersion"] integerValue];
-        
         // Remove the old plug-in version if it needs updating.
         if (installedPhonePlugInVersion < phonePlugInVersion) {
             BOOL removed = [fileManager removeItemAtPath:phonePlugInInstallPath error:error];
@@ -994,7 +922,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     if (installedSIPAddressPlugInBundle != nil) {
         NSInteger installedSIPAddressPlugInVersion = [[[installedSIPAddressPlugInBundle infoDictionary]
                                                        objectForKey:@"CFBundleVersion"] integerValue];
-        
         // Remove the old plug-in version if it needs updating.
         if (installedSIPAddressPlugInVersion < SIPAddressPlugInVersion) {
             BOOL removed = [fileManager removeItemAtPath:SIPAddressPlugInInstallPath error:error];
@@ -1022,10 +949,8 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
             return NO;
         }
     }
-    
-    return YES;
+	return YES;
 }
-
 - (NSString *)localizedStringForSIPResponseCode:(NSInteger)responseCode {
     NSString *localizedString = nil;
     
@@ -1246,10 +1171,8 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
             localizedString = nil;
             break;
     }
-    
-    return localizedString;
+	return localizedString;
 }
-
 
 #pragma mark -
 #pragma mark AccountSetupController delegate
@@ -1262,13 +1185,13 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
                             [accountDict objectForKey:kDomain]];
     
     AccountController *theAccountController
-        = [[[AccountController alloc] initWithFullName:[accountDict objectForKey:kFullName]
+        = [AccountController.alloc initWithFullName:[accountDict objectForKey:kFullName]
                                             SIPAddress:SIPAddress
                                              registrar:[accountDict objectForKey:kDomain]
                                                  realm:[accountDict objectForKey:kRealm]
-                                              username:[accountDict objectForKey:kUsername]]
-           autorelease];
-    
+                                              username:[accountDict objectForKey:kUsername]];
+//           autorelease];
+
     [[theAccountController window] setExcludedFromWindowsMenu:YES];
     
     [theAccountController setEnabled:YES];
@@ -1287,7 +1210,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     }
 }
 
-
 #pragma mark -
 #pragma mark PreferencesController delegate
 
@@ -1302,7 +1224,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     [[self accountControllers] removeObjectAtIndex:index];
     [self updateAccountsMenuItems];
 }
-
 - (void)preferencesControllerDidChangeAccountEnabled:(NSNotification *)notification {
     NSUInteger index = [[[notification userInfo] objectForKey:kAccountIndex] integerValue];
     
@@ -1328,15 +1249,15 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         }
         
         AccountController *theAccountController
-            = [[[AccountController alloc] initWithFullName:[accountDict objectForKey:kFullName]
+            = [AccountController.alloc initWithFullName:[accountDict objectForKey:kFullName]
                                                 SIPAddress:SIPAddress
                                                  registrar:registrar
                                                      realm:[accountDict objectForKey:kRealm]
-                                                  username:[accountDict objectForKey:kUsername]]
-               autorelease];
-        
-        [[theAccountController window] setExcludedFromWindowsMenu:YES];
-        
+                                                  username:[accountDict objectForKey:kUsername]];
+//               autorelease];
+
+		[[theAccountController window] setExcludedFromWindowsMenu:YES];
+
         NSString *description = [accountDict objectForKey:kDescription];
         [theAccountController setAccountDescription:description];
         if ([description length] > 0) {
@@ -1361,7 +1282,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [[self accountControllers] replaceObjectAtIndex:index withObject:theAccountController];
         
         [[theAccountController window] orderFront:nil];
-        
         // We need to register accounts with IP address as registrar manually.
         if ([[[theAccountController account] registrar] ak_isIPAddress] &&
             [[theAccountController registrarReachability] isReachable]) {
@@ -1372,10 +1292,8 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         
     } else {
         AccountController *theAccountController = [[self accountControllers] objectAtIndex:index];
-        
         // Close all call windows hanging up all calls.
         [[theAccountController callControllers] makeObjectsPerformSelector:@selector(close)];
-        
         // Remove account from the user agent.
         [theAccountController removeAccountFromUserAgent];
         [theAccountController setEnabled:NO];
@@ -1383,14 +1301,12 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [theAccountController setAttemptingToUnregisterAccount:NO];
         [theAccountController setShouldPresentRegistrationError:NO];
         [[theAccountController window] orderOut:nil];
-        
         // Prevent conflict with setFrameAutosaveName: when re-enabling the account.
         [theAccountController setWindow:nil];
     }
     
     [self updateAccountsMenuItems];
 }
-
 - (void)preferencesControllerDidSwapAccounts:(NSNotification *)notification {
     NSDictionary *userInfo = [notification userInfo];
     NSInteger sourceIndex = [[userInfo objectForKey:kSourceIndex] integerValue];
@@ -1411,7 +1327,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     
     [self updateAccountsMenuItems];
 }
-
 - (void)preferencesControllerDidChangeNetworkSettings:(NSNotification *)notification {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
@@ -1435,7 +1350,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     }
 }
 
-
 #pragma mark -
 #pragma mark AKSIPUserAgentDelegate protocol
 
@@ -1443,7 +1357,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
 - (BOOL)SIPUserAgentShouldAddAccount:(AKSIPAccount *)anAccount {
     if ([[self userAgent] state] < kAKSIPUserAgentStarting) {
         [[self userAgent] start];
-        
         // Don't add the account right now, let user agent start first.
         // The account should be added later, from the callback.
         return NO;
@@ -1453,10 +1366,8 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         // The account should be added later, from the callback.
         return NO;
     }
-    
-    return YES;
+	return YES;
 }
-
 
 #pragma mark -
 #pragma mark AKSIPUserAgent notifications
@@ -1477,7 +1388,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
               "Please check your network connection and STUN server settings.");
         
         [self setShouldRegisterAllAccounts:NO];
-        
         // Set |shouldPresentUserAgentLaunchError| if needed and if it wasn't set
         // somewhere else.
         if (![self shouldPresentUserAgentLaunchError]) {
@@ -1495,7 +1405,7 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         
         if ([self shouldPresentUserAgentLaunchError] && [NSApp modalWindow] == nil) {
             // Display application modal alert.
-            NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+            NSAlert *alert = NSAlert.new;
             [alert addButtonWithTitle:@"OK"];
             [alert setMessageText:NSLocalizedString(@"Could not start SIP user agent.",
                                                     @"SIP user agent start error.")];
@@ -1508,7 +1418,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     
     [self setShouldPresentUserAgentLaunchError:NO];
 }
-
 - (void)SIPUserAgentDidFinishStopping:(NSNotification *)notification {
     if ([self isTerminating]) {
         [NSApp replyToApplicationShouldTerminate:YES];
@@ -1521,9 +1430,8 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         }
     }
 }
-
 - (void)SIPUserAgentDidDetectNAT:(NSNotification *)notification {
-    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    NSAlert *alert = NSAlert.new;// [[[NSAlert alloc] init] autorelease];
     [alert addButtonWithTitle:@"OK"];
     
     switch ([[self userAgent] detectedNATType]) {
@@ -1563,7 +1471,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     }
 }
 
-
 #pragma mark -
 #pragma mark NSWindow notifications
 
@@ -1577,7 +1484,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [NSApp terminate:self];
     }
 }
-
 
 #pragma mark -
 #pragma mark NSApplication delegate methods
@@ -1628,13 +1534,11 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         
         // Disable Preferences during the first account prompt.
         [[self preferencesMenuItem] setAction:NULL];
-        
         // Subscribe to addAccountWindow close to terminate application.
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(windowWillClose:)
                                                      name:NSWindowWillCloseNotification
                                                    object:[[self accountSetupController] window]];
-        
         // Set different targets and actions of addAccountWindow buttons to add the first account.
         [[[self accountSetupController] defaultButton] setTarget:self];
         [[[self accountSetupController] defaultButton] setAction:@selector(addAccountOnFirstLaunch:)];
@@ -1643,7 +1547,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         
         [[[self accountSetupController] window] center];
         [[[self accountSetupController] window] makeKeyAndOrderFront:self];
-        
         // Early return.
         return;
     }
@@ -1673,13 +1576,13 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         NSString *username = [accountDict objectForKey:kUsername];
         
         AccountController *anAccountController
-            = [[[AccountController alloc] initWithFullName:fullName
+            = [AccountController.alloc initWithFullName:fullName
                                                 SIPAddress:SIPAddress
                                                  registrar:registrar
                                                      realm:realm
-                                                  username:username]
-               autorelease];
-        
+                                                  username:username];
+//               autorelease];
+
         [[anAccountController window] setExcludedFromWindowsMenu:YES];
         
         NSString *description = [accountDict objectForKey:kDescription];
@@ -1724,7 +1627,7 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     [self updateAccountsMenuItems];
     
     // Install audio devices changes callback.
-    AudioHardwareAddPropertyListener(kAudioHardwarePropertyDevices, &AudioDevicesChanged, self);
+    AudioHardwareAddPropertyListener(kAudioHardwarePropertyDevices, &AudioDevicesChanged, (__bridge void *)(self)); // CFBridgingRetain(self));
     
     // Get available audio devices, select devices for sound input and output.
     [self updateAudioDevices];
@@ -1778,10 +1681,8 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
             [[[self enabledAccountControllers] objectAtIndex:0] showWindow:self];
         }
     }
-    
-    return YES;
+	return YES;
 }
-
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification {
     // Invalidate application's Dock icon bouncing timer.
     if ([self userAttentionTimer] != nil) {
@@ -1789,10 +1690,9 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [self setUserAttentionTimer:nil];
     }
 }
-
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
     if ([self hasActiveCallControllers]) {
-        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        NSAlert *alert = NSAlert.new;// [[[NSAlert alloc] init] autorelease];
         [alert addButtonWithTitle:NSLocalizedString(@"Quit", @"Quit button.")];
         [alert addButtonWithTitle:NSLocalizedString(@"Cancel", @"Cancel button.")];
         [[[alert buttons] objectAtIndex:1] setKeyEquivalent:@"\033"];
@@ -1810,16 +1710,13 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     if ([[self userAgent] isStarted]) {
         [self setTerminating:YES];
         [self stopUserAgent];
-        
         // Terminate after SIP user agent is stopped in the secondary thread.
         // We should send replyToApplicationShouldTerminate: to NSApp from
         // AKSIPUserAgentDidFinishStoppingNotification.
         return NSTerminateLater;
     }
-    
-    return NSTerminateNow;
+	return NSTerminateNow;
 }
-
 
 #pragma mark -
 #pragma mark AKSIPAccount notifications
@@ -1831,7 +1728,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     }
 }
 
-
 #pragma mark -
 #pragma mark AKSIPCall notifications
 
@@ -1842,7 +1738,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [self setShouldSetUserAgentSoundIO:NO];
     }
 }
-
 - (void)SIPCallIncoming:(NSNotification *)notification {
     if ([self shouldSetUserAgentSoundIO] &&
         [[self userAgent] activeCallsCount] > 0) {
@@ -1852,7 +1747,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     
     [self updateDockTileBadgeLabel];
 }
-
 - (void)SIPCallDidDisconnect:(NSNotification *)notification {
     if ([self shouldRestartUserAgentASAP] && ![self hasActiveCallControllers]) {
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(restartUserAgent) object:nil];
@@ -1860,7 +1754,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [self restartUserAgent];
     }
 }
-
 
 #pragma mark -
 #pragma mark AuthenticationFailureController notifications
@@ -1891,7 +1784,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     }
 }
 
-
 #pragma mark -
 #pragma mark GrowlApplicationBridgeDelegate protocol
 
@@ -1904,7 +1796,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     [aCallController showWindow:nil];
 }
 
-
 #pragma mark -
 #pragma mark NSWorkspace notifications
 
@@ -1914,7 +1805,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [self stopUserAgent];
     }
 }
-
 - (void)workspaceDidWake:(NSNotification *)notification {
     [self setShouldSetUserAgentSoundIO:YES];
 }
@@ -1932,7 +1822,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [anAccountController setAccountRegistered:YES];
     }
 }
-
 
 #pragma mark -
 #pragma mark Address Book plug-in notifications
@@ -1992,7 +1881,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
     }
 }
 
-
 #pragma mark -
 #pragma mark Apple event handler for URLs support
 
@@ -2012,7 +1900,6 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
         [firstEnabledAccountController handleCatchedURL];
     }
 }
-
 
 #pragma mark -
 #pragma mark Service Provider
@@ -2046,29 +1933,27 @@ static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, 
 
 @end
 
-
 #pragma mark -
 
 // Sends updateAudioDevices to AppController.
 static OSStatus AudioDevicesChanged(AudioHardwarePropertyID propertyID,
                                     void *clientData) {
     
-    AppController *appController = (AppController *)clientData;
+    AppController *appController = (__bridge AppController *)clientData;
     
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
-    if (propertyID == kAudioHardwarePropertyDevices) {
-        [NSObject cancelPreviousPerformRequestsWithTarget:appController
-                                                 selector:@selector(updateAudioDevices)
-                                                   object:nil];
-        [appController performSelector:@selector(updateAudioDevices) withObject:nil afterDelay:0.2];
-    } else {
-        NSLog(@"Not handling this property id");
-    }
-    
-    [pool release];
-    
-    return noErr;
+	@autoreleasepool {
+
+		if (propertyID == kAudioHardwarePropertyDevices) {
+			[NSObject cancelPreviousPerformRequestsWithTarget:appController
+													 selector:@selector(updateAudioDevices)
+													   object:nil];
+			[appController performSelector:@selector(updateAudioDevices) withObject:nil afterDelay:0.2];
+		} else {
+			NSLog(@"Not handling this property id");
+		}
+
+	}
+	return noErr;
 }
 
 static OSStatus GetAudioDevices(Ptr *devices, UInt16 *devicesCount) {
@@ -2096,8 +1981,7 @@ static OSStatus GetAudioDevices(Ptr *devices, UInt16 *devicesCount) {
     if (err != noErr) {
         return err;
     }
-    
-    return err;
+	return err;
 }
 
 static void NameserversChanged(SCDynamicStoreRef store, CFArrayRef changedKeys, void *info) {

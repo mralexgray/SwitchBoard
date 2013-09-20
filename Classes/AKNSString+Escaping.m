@@ -28,7 +28,6 @@
 
 #import "AKNSString+Escaping.h"
 
-
 @implementation NSString (AKStringEscapingAdditions)
 
 - (NSString *)ak_escapeFirstCharacterFromString:(NSString *)string {
@@ -42,18 +41,14 @@
         searchRange.length = [newString length] - searchRange.location;
         escapeCharacterRange = [newString rangeOfString:escapeCharacterString options:0 range:searchRange];
     }
-    
-    return [[newString copy] autorelease];
+	return [newString copy];
 }
-
 - (NSString *)ak_escapeQuotes {
     return [self ak_escapeFirstCharacterFromString:@"\""];
 }
-
 - (NSString *)ak_escapeParentheses {
     NSString *returnString = [self ak_escapeFirstCharacterFromString:@")"];
-    
-    return [returnString ak_escapeFirstCharacterFromString:@"("];
+	return [returnString ak_escapeFirstCharacterFromString:@"("];
 }
 
 @end

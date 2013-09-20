@@ -35,16 +35,18 @@
 // XS for Xtra-Special!
 
 @class XSWindowController;
-@interface XSViewController : NSViewController {
-@private
-	XSViewController *_parent;
-	XSWindowController *_windowController;
-	NSMutableArray *_children;
-}
+@interface XSViewController : NSViewController
+//{
+//@private
+//	XSViewController *__weak _parent;
+//	XSWindowController *__weak _windowController;
+//	NSMutableArray *_children;
+//}
 
-@property(assign) XSViewController *parent;
-@property(assign) XSWindowController *windowController;
-@property(readonly,copy) NSMutableArray *children; // there's no mutableCopy keyword so this will be @synthesized in the implementation to get the default getter, but we'll write our own setter, otherwise mutability is lost
+@property(nonatomic, weak) XSViewController *parent;
+@property(nonatomic, weak) XSWindowController *windowController;
+//@property(readonly,strong) NSMutableArray *children;//copy) NSMutableArray *children; // there's no mutableCopy keyword so this will be @synthesized in the implementation to get the default getter, but we'll write our own setter, otherwise mutability is lost
+@property(nonatomic,strong) NSMutableArray *children;//copy) NSMutableArray *children; // there's no mutableCopy keyword so this will be @synthesized in the implementation to get the default getter, but we'll write our own setter, otherwise mutability is lost
 
 - (id)initWithNibName:(NSString *)name bundle:(NSBundle *)bundle windowController:(XSWindowController *)windowController;
 

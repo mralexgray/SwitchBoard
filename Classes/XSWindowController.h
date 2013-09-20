@@ -33,10 +33,11 @@
 #import <Cocoa/Cocoa.h>
 
 @class XSViewController;
-@interface XSWindowController : NSWindowController {
-	NSMutableArray *_viewControllers;
-} 
-@property(nonatomic,copy,readonly)  NSMutableArray *viewControllers;
+@interface XSWindowController : NSWindowController
+//{
+//	NSMutableArray *_viewControllers;
+//} 
+@property(nonatomic, strong) NSMutableArray *viewControllers;//;,copy,readonly)  NSMutableArray *viewControllers;
 
 - (NSUInteger)countOfViewControllers;
 - (XSViewController *)objectInViewControllersAtIndex:(NSUInteger)index;

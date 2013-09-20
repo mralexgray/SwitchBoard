@@ -28,15 +28,13 @@
 
 #import "AKNSString+Creating.h"
 
-
 @implementation NSString (AKStringCreatingAdditions)
 
 + (NSString *)ak_uuidString {
     CFUUIDRef theUUID = CFUUIDCreate(NULL);
     CFStringRef string = CFUUIDCreateString(NULL, theUUID);
     CFRelease(theUUID);
-    
-    return [(NSString *)string autorelease];
+	return [(NSString *)string autorelease];
 }
 
 @end

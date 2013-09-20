@@ -37,20 +37,20 @@
 
 @interface XSViewController (Private)
 // This method is made private so users of the class can't (easily) set the children array whenever they want, they must use the indexed accessors provided. If this was public then our methods that mantain the responder chain and pass the represented object and window controller to the children would be subverted. Alternatively the setter could set all the required variables on the objects in the newChildren array, but the API then becomes a little clunkier.
-- (void)setChildren:(NSMutableArray *)newChildren;
+//- (void)setChildren:(NSMutableArray *)newChildren;
+//@property (nonatomic, strong) NSMutableArray *children;
 @end
+//
+//@implementation XSViewController (Private)
+//- (void)setChildren:(NSMutableArray *)newChildren;
+//{
+//	if (_children == newChildren)
+//		return;
+//	NSMutableArray *newChildrenCopy = [newChildren mutableCopy];
+//	_children = newChildrenCopy;
+//}
+//@end
 
-@implementation XSViewController (Private)
-- (void)setChildren:(NSMutableArray *)newChildren;
-{
-	if (_children == newChildren)
-		return;
-	NSMutableArray *newChildrenCopy = [newChildren mutableCopy];
-	[_children release];
-	_children = newChildrenCopy;
-}
-@end
- 
 #pragma mark -
 #pragma mark Public API
 
@@ -84,12 +84,10 @@
                                  userInfo:nil];
 	return nil;
 }
-
 - (void)dealloc;
 {
 // removed the self.parent = nil and self.windowController = nil as this can mask bugs that may occurr if the user sends a message to either of those
-	[self.children release];
-	[super dealloc];
+//	self.children;
 }
 
 #pragma mark Indexed Accessors
@@ -98,10 +96,9 @@
 {
 	return [self.children count];
 }
-
 - (XSViewController *)objectInChildrenAtIndex:(NSUInteger)index;
 {
-	return [self.children objectAtIndex:index];
+	return (self.children)[index];
 }
 
 // ------------------------------------------
@@ -111,32 +108,27 @@
 {
 	[self insertObject:viewController inChildrenAtIndex:[self.children count]];
 }
-
 - (void)removeChild:(XSViewController *)viewController;
 {
 	[self.children removeObject:viewController];
 }
-
 - (void)removeObjectFromChildrenAtIndex:(NSUInteger)index;
 {
 	[self.children removeObjectAtIndex:index];
 	[(XSWindowController *)self.windowController patchResponderChain]; // each time a controller is removed then the repsonder chain needs fixing
 }
-
 - (void)insertObject:(XSViewController *)viewController inChildrenAtIndex:(NSUInteger)index;
 {
 	[self.children insertObject:viewController atIndex:index];
 	[viewController setParent:self];
 	[self.windowController patchResponderChain];
 }
-
 - (void)insertObjects:(NSArray *)viewControllers inChildrenAtIndexes:(NSIndexSet *)indexes;
 {
 	[self.children insertObjects:viewControllers atIndexes:indexes];
 	[viewControllers makeObjectsPerformSelector:@selector(setParent:) withObject:self];
 	[self.windowController patchResponderChain]; 
 }
-
 - (void)insertObjects:(NSArray *)viewControllers inChildrenAtIndex:(NSUInteger)index;
 {
 	[self insertObjects:viewControllers inChildrenAtIndexes:[NSIndexSet indexSetWithIndex:index]];
@@ -168,7 +160,7 @@
 		if ([child countOfChildren] > 0)
 			[array addObjectsFromArray:[child descendants]];
 	}
-	return [[array copy] autorelease]; // return an immutable array
+	return [array copy]; // return an immutable array
 }
 
 // --------------------------------------

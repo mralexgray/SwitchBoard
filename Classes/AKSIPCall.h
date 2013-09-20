@@ -2,34 +2,8 @@
 //  AKSIPCall.h
 //  Telephone
 
-/**	Copyright (c) 2008-2012 Alexei Kuznetsov. All rights reserved.
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
-  1. Redistributions of source code must retain the above copyright notice,
-     this list of conditions and the following disclaimer.
-  2. Redistributions in binary form must reproduce the above copyright notice,
-     this list of conditions and the following disclaimer in the documentation
-     and/or other materials provided with the distribution.
-  3. Neither the name of the copyright holder nor the names of contributors
-     may be used to endorse or promote products derived from this software
-     without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE THE COPYRIGHT HOLDER
-  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-  OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  */
-
 #import <Foundation/Foundation.h>
 #import <pjsua-lib/pjsua.h>
-
 
 extern const NSInteger kAKSIPCallsMax;
 
@@ -92,13 +66,13 @@ extern NSString * const AKSIPCallDidRemoteHoldNotification;
 // Key: @"AKFinalTransferNotification".
 extern NSString * const AKSIPCallTransferStatusDidChangeNotification;
 
-@class AKSIPAccount, AKSIPURI;
+@class AKSIPAccount, AKSIPURI, AKSIPCallMediaFlow;
 
 // A class representing a SIP call.
 @interface AKSIPCall : NSObject
 
 // The receiver's delegate.
-@property (nonatomic, assign) id delegate;
+@property (nonatomic, unsafe_unretained) id delegate;
 
 // The receiver's identifier.
 @property (nonatomic, assign) NSInteger identifier;
@@ -150,7 +124,9 @@ extern NSString * const AKSIPCallTransferStatusDidChangeNotification;
 @property (nonatomic, readonly, assign, getter=isOnRemoteHold) BOOL onRemoteHold;
 
 // The account the call belongs to.
-@property (nonatomic, assign) AKSIPAccount *account;
+@property (nonatomic, weak) AKSIPAccount *account;
+
+@property (nonatomic, strong) AKSIPCallMediaFlow *mediaFlow;
 
 // Designated initializer.
 // Initializes a AKSIPCall object with a given SIP account and identifier.
@@ -204,9 +180,8 @@ extern NSString * const AKSIPCallTransferStatusDidChangeNotification;
 // Toggles call hold.
 - (void)toggleHold;
 
-- (void)startRecording:(NSString*)toFile;
-
-- (void)stopRecording;
-
+- (void) record;
+- (void) play;
+- (void) say:(NSString*) words;
 
 @end

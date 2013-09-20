@@ -28,7 +28,6 @@
 
 #import <Foundation/Foundation.h>
 
-
 // A category for escaping strings.
 @interface NSString (AKStringEscapingAdditions)
 

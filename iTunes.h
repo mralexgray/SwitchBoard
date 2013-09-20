@@ -5,7 +5,6 @@
 #import <AppKit/AppKit.h>
 #import <ScriptingBridge/ScriptingBridge.h>
 
-
 @class iTunesPrintSettings, iTunesApplication, iTunesItem, iTunesArtwork, iTunesEncoder, iTunesEQPreset, iTunesPlaylist, iTunesAudioCDPlaylist, iTunesDevicePlaylist, iTunesLibraryPlaylist, iTunesRadioTunerPlaylist, iTunesSource, iTunesTrack, iTunesAudioCDTrack, iTunesDeviceTrack, iTunesFileTrack, iTunesSharedTrack, iTunesURLTrack, iTunesUserPlaylist, iTunesFolderPlaylist, iTunesVisual, iTunesWindow, iTunesBrowserWindow, iTunesEQWindow, iTunesPlaylistWindow;
 
 typedef enum {
@@ -84,8 +83,6 @@ typedef enum {
 	iTunesERtKComputed = 'kRtC' /* iTunes-computed rating */
 } iTunesERtK;
 
-
-
 /*
  * Standard Suite
  */
@@ -113,8 +110,6 @@ typedef enum {
 - (void) playOnce:(BOOL)once;  // play the current track or the specified track or file.
 
 @end
-
-
 
 /*
  * iTunes Suite
@@ -207,14 +202,12 @@ typedef enum {
 @property NSInteger kind;  // kind or purpose of this piece of artwork
 @property (copy) id rawData;  // data for this artwork, in original format
 
-
 @end
 
 // converts a track to a specific file format
 @interface iTunesEncoder : iTunesItem
 
 @property (copy, readonly) NSString *format;  // the data format created by the encoder
-
 
 @end
 
@@ -234,7 +227,6 @@ typedef enum {
 @property (readonly) BOOL modifiable;  // can this preset be modified?
 @property double preamp;  // the equalizer preamp level (-12.0 dB to +12.0 dB)
 @property BOOL updateTracks;  // should tracks which refer to this preset be updated when the preset is renamed or deleted?
-
 
 @end
 
@@ -271,14 +263,12 @@ typedef enum {
 @property (copy) NSString *genre;  // the genre of the CD
 @property NSInteger year;  // the year the album was recorded/released
 
-
 @end
 
 // a playlist representing the contents of a portable device
 @interface iTunesDevicePlaylist : iTunesPlaylist
 
 - (SBElementArray *) deviceTracks;
-
 
 @end
 
@@ -289,14 +279,12 @@ typedef enum {
 - (SBElementArray *) URLTracks;
 - (SBElementArray *) sharedTracks;
 
-
 @end
 
 // the radio tuner playlist
 @interface iTunesRadioTunerPlaylist : iTunesPlaylist
 
 - (SBElementArray *) URLTracks;
-
 
 @end
 
@@ -383,7 +371,6 @@ typedef enum {
 @property NSInteger volumeAdjustment;  // relative volume adjustment of the track (-100% to 100%)
 @property NSInteger year;  // the year the track was recorded/released
 
-
 @end
 
 // a track on an audio CD
@@ -391,12 +378,10 @@ typedef enum {
 
 @property (copy, readonly) NSURL *location;  // the location of the file represented by this track
 
-
 @end
 
 // a track residing on a portable music player
 @interface iTunesDeviceTrack : iTunesTrack
-
 
 @end
 
@@ -411,7 +396,6 @@ typedef enum {
 
 // a track residing in a shared library
 @interface iTunesSharedTrack : iTunesTrack
-
 
 @end
 
@@ -434,18 +418,15 @@ typedef enum {
 @property BOOL shared;  // is this playlist shared?
 @property (readonly) BOOL smart;  // is this a Smart Playlist?
 
-
 @end
 
 // a folder that contains other playlists
 @interface iTunesFolderPlaylist : iTunesUserPlaylist
 
-
 @end
 
 // a visual plug-in
 @interface iTunesVisual : iTunesItem
-
 
 @end
 
@@ -462,7 +443,6 @@ typedef enum {
 @property (readonly) BOOL zoomable;  // is the window zoomable?
 @property BOOL zoomed;  // is the window zoomed?
 
-
 @end
 
 // the main iTunes window
@@ -472,14 +452,12 @@ typedef enum {
 @property (copy, readonly) SBObject *selection;  // the selected songs
 @property (copy) iTunesPlaylist *view;  // the playlist currently displayed in the window
 
-
 @end
 
 // the iTunes equalizer window
 @interface iTunesEQWindow : iTunesWindow
 
 @property BOOL minimized;  // is the small EQ window visible?
-
 
 @end
 
@@ -488,7 +466,6 @@ typedef enum {
 
 @property (copy, readonly) SBObject *selection;  // the selected songs
 @property (copy, readonly) iTunesPlaylist *view;  // the playlist displayed in the window
-
 
 @end
 

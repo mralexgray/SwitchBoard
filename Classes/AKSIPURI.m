@@ -2,38 +2,12 @@
 //  AKSIPURI.m
 //  Telephone
 
-/**	Copyright (c) 2008-2012 Alexei Kuznetsov. All rights reserved.
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
-  1. Redistributions of source code must retain the above copyright notice,
-     this list of conditions and the following disclaimer.
-  2. Redistributions in binary form must reproduce the above copyright notice,
-     this list of conditions and the following disclaimer in the documentation
-     and/or other materials provided with the distribution.
-  3. Neither the name of the copyright holder nor the names of contributors
-     may be used to endorse or promote products derived from this software
-     without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE THE COPYRIGHT HOLDER
-  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-  OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  */
-
 #import "AKSIPURI.h"
 
 #import <pjsua-lib/pjsua.h>
 
 #import "AKNSString+PJSUA.h"
 #import "AKSIPUserAgent.h"
-
 
 @implementation AKSIPURI
 
@@ -45,15 +19,14 @@
     }
 }
 
-
 #pragma mark -
 
 + (id)SIPURIWithUser:(NSString *)aUser host:(NSString *)aHost displayName:(NSString *)aDisplayName {
-    return [[[self alloc] initWithUser:aUser host:aHost displayName:aDisplayName] autorelease];
+    return [[self alloc] initWithUser:aUser host:aHost displayName:aDisplayName];
 }
 
 + (id)SIPURIWithString:(NSString *)SIPURIString {
-    return [[[self alloc] initWithString:SIPURIString] autorelease];
+    return [[self alloc] initWithString:SIPURIString];
 }
 
 // Designated initializer.
@@ -66,14 +39,11 @@
     [self setDisplayName:aDisplayName];
     [self setUser:aUser];
     [self setHost:aHost];
-    
-    return self;
+	return self;
 }
-
 - (id)init {
     return [self initWithUser:nil host:nil displayName:nil];
 }
-
 - (id)initWithString:(NSString *)SIPURIString {
     self = [super init];
     if (self == nil) {
@@ -84,8 +54,7 @@
     if ([predicate evaluateWithObject:SIPURIString]) {
         NSRange delimiterRange = [SIPURIString rangeOfString:@" <"];
         
-        NSMutableCharacterSet *trimmingCharacterSet = [[[NSCharacterSet whitespaceCharacterSet] mutableCopy]
-                                                       autorelease];
+        NSMutableCharacterSet *trimmingCharacterSet = [[NSCharacterSet whitespaceCharacterSet] mutableCopy];
         [trimmingCharacterSet addCharactersInString:@"\""];
         [self setDisplayName:[[SIPURIString substringToIndex:delimiterRange.location]
                               stringByTrimmingCharactersInSet:trimmingCharacterSet]];
@@ -107,7 +76,6 @@
     }
     
     if (![[AKSIPUserAgent sharedUserAgent] isStarted]) {
-        [self release];
         return nil;
     }
     
@@ -116,7 +84,6 @@
                                                   (char *)[SIPURIString cStringUsingEncoding:NSUTF8StringEncoding],
                                                   [SIPURIString length], PJSIP_PARSE_URI_AS_NAMEADDR);
     if (nameAddr == NULL) {
-        [self release];
         return nil;
     }
     
@@ -146,26 +113,10 @@
         [self setUser:[NSString stringWithPJString:uri->number]];
         
     } else {
-        [self release];
         return nil;
     }
-    
-    return self;
+	return self;
 }
-
-- (void)dealloc {
-    [_displayName release];
-    [_user release];
-    [_password release];
-    [_host release];
-    [_userParameter release];
-    [_methodParameter release];
-    [_transportParameter release];
-    [_maddrParameter release];
-    
-    [super dealloc];
-}
-
 - (NSString *)description {
     NSString *SIPAddressWithPort = [self SIPAddress];
     if ([self port] > 0) {
@@ -178,7 +129,6 @@
         return [NSString stringWithFormat:@"<sip:%@>", SIPAddressWithPort];
     }
 }
-
 
 #pragma mark -
 #pragma mark NSCopying protocol

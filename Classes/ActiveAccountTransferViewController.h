@@ -30,7 +30,6 @@
 
 #import "ActiveAccountViewController.h"
 
-
 // A controller that acts as an account controller inside call transfer sheet.
 @interface ActiveAccountTransferViewController : ActiveAccountViewController
 

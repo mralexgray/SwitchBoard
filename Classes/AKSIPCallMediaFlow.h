@@ -1,22 +1,19 @@
 
-
-
 #import <Foundation/Foundation.h>
 #import <pjsua-lib/pjsua.h>
+//#import "AZSpeechSynthesizer.h"
 
-@class AKSIPCall;
-// A class representing a SIP call recorder, broadcaster.
-@interface AKSIPCallMediaFlow : NSObject
+@class 	   AKSIPCall;//, AZSpeechSynthesizer;
 
-// Designated initializer.	 Initializes a AKSIPCall object with a given SIP account and identifier.
-- (id)initWithCall:(AKSIPCall *)aCall shouldPlay:(id)aSound
-								     andOrRecord:(BOOL)shouldRecord;
-// The receiver's delegate.
+@interface AKSIPCallMediaFlow : NSObject //<AZSpeechDelegate>
+
 @property (nonatomic, assign) AKSIPCall *call;
 
-@property (strong, nonatomic) NSString *saveFile, *playFile;
+@property (nonatomic, strong) NSString 	*whatToPlay,		*whereToSave;
+@property (nonatomic, strong) NSNumber	*playerID, 		*recorderID;
+@property (nonatomic, strong) NSMutableArray *synthesizers;
 
-- (void) playSound:(NSString*)sound;
-- (void) record;
+- (id)initWithCall:(AKSIPCall *)aCall playing:(NSString*)audioOut recordingTo:(NSString*)audioIn;
+- (void) say:(NSString*) words;
 
 @end

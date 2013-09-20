@@ -2,36 +2,10 @@
 //  AccountController.h
 //  Telephone
 
-/**	Copyright (c) 2008-2012 Alexei Kuznetsov. All rights reserved.
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
-  1. Redistributions of source code must retain the above copyright notice,
-     this list of conditions and the following disclaimer.
-  2. Redistributions in binary form must reproduce the above copyright notice,
-     this list of conditions and the following disclaimer in the documentation
-     and/or other materials provided with the distribution.
-  3. Neither the name of the copyright holder nor the names of contributors
-     may be used to endorse or promote products derived from this software
-     without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE THE COPYRIGHT HOLDER
-  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-  OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  */
-
 #import <Cocoa/Cocoa.h>
 
 #import "AKSIPAccount.h"
 #import "XSWindowController.h"
-
 
 // Account states.
 enum {
@@ -54,13 +28,13 @@ extern NSString * const kEmailSIPLabel;
 @property (nonatomic, assign, getter=isEnabled) BOOL enabled;
 
 // A SIP account the receiver controls.
-@property (nonatomic, retain) AKSIPAccount *account;
+@property (nonatomic, strong) AKSIPAccount *account;
 
 // A Boolean value indicating whether account is registered.
 @property (nonatomic, assign, getter=isAccountRegistered) BOOL accountRegistered;
 
 // An array of call controllers managed by the receiver.
-@property (nonatomic, retain) NSMutableArray *callControllers;
+@property (nonatomic, strong) NSMutableArray *callControllers;
 
 // Account description.
 @property (nonatomic, copy) NSString *accountDescription;
@@ -86,7 +60,7 @@ extern NSString * const kEmailSIPLabel;
 @property (nonatomic, copy) NSString *catchedURLString;
 
 // Registrar network reachability. When registrar becomes reachable, we try to register the receiver's account.
-@property (nonatomic, retain) AKNetworkReachability *registrarReachability;
+@property (nonatomic, strong) AKNetworkReachability *registrarReachability;
 
 // A Boolean value indicating whether a plus character at the beginning of the phone number to be dialed should be
 // replaced.
@@ -102,8 +76,7 @@ extern NSString * const kEmailSIPLabel;
 @property (nonatomic, readonly) AuthenticationFailureController *authenticationFailureController;
 
 // Account state pop-up button outlet.
-@property (nonatomic, retain) IBOutlet NSPopUpButton *accountStatePopUp;
-
+@property (nonatomic, strong) IBOutlet NSPopUpButton *accountStatePopUp;
 
 // Designated initializer.
 // Initializes an AccountController object with a given account.

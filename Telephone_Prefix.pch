@@ -4,4 +4,16 @@
 
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
+	#import "StandardPaths.h"
+
+	#import <CoreAudio/CoreAudio.h>
+	#if !defined(__COREAUDIO_USE_FLAT_INCLUDES__)
+	#include <AudioToolbox/AudioToolbox.h>
+	#include <CoreFoundation/CoreFoundation.h>
+	#else
+	#include "AudioToolbox.h"
+	#include "CoreFoundation.h"
+	#endif
+	#import "AKNSString+PJSUA.h"
+
 #endif

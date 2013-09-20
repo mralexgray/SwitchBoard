@@ -30,7 +30,6 @@
 
 #import "AccountController.h"
 
-
 @implementation ActiveAccountTransferViewController
 
 - (id)initWithAccountController:(AccountController *)anAccountController
@@ -43,16 +42,14 @@
     }
     return self;
 }
-
 - (IBAction)makeCallToTransferDestination:(id)sender {
     if ([[[self callDestinationField] objectValue] count] == 0) {
         return;
     }
     
-    NSDictionary *callDestinationDict = [[[[self callDestinationField] objectValue] objectAtIndex:0]
-                                         objectAtIndex:[self callDestinationURIIndex]];
+    NSDictionary *callDestinationDict = [[self callDestinationField] objectValue][0][[self callDestinationURIIndex]];
     
-    NSString *phoneLabel = [callDestinationDict objectForKey:kPhoneLabel];
+    NSString *phoneLabel = callDestinationDict[kPhoneLabel];
     
     AKSIPURI *uri = [self callDestinationURI];
     if (uri != nil) {
@@ -61,7 +58,6 @@
                          callTransferController:[[sender window] windowController]];
     }
 }
-
 - (IBAction)makeCall:(id)sender {
     return;
 }

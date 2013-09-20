@@ -2,31 +2,6 @@
 //  ActiveCallViewController.m
 //  Telephone
 
-/**	Copyright (c) 2008-2012 Alexei Kuznetsov. All rights reserved.
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
-  1. Redistributions of source code must retain the above copyright notice,
-     this list of conditions and the following disclaimer.
-  2. Redistributions in binary form must reproduce the above copyright notice,
-     this list of conditions and the following disclaimer in the documentation
-     and/or other materials provided with the distribution.
-  3. Neither the name of the copyright holder nor the names of contributors
-     may be used to endorse or promote products derived from this software
-     without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE THE COPYRIGHT HOLDER
-  OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-  OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  */
-
 #import "ActiveCallViewController.h"
 
 #import "AKNSWindow+Resizing.h"
@@ -36,10 +11,19 @@
 #import "CallController.h"
 #import "CallTransferController.h"
 #import "EndedCallViewController.h"
-
+#import "AKSIPCallMediaFlow.h"
 
 @implementation ActiveCallViewController
 
+- (IBAction)mediaFlowClick:(id)sender
+
+{
+	if (_mediaFlowControl.selectedSegment == 0 )
+		[self.callController.call say:@"The Apple Software is provided by Apple on MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION"];
+		else
+		[self.callController.call play];
+
+}
 - (id)initWithNibName:(NSString *)nibName callController:(CallController *)callController {
     self = [super initWithNibName:nibName bundle:nil windowController:callController];
     
@@ -49,32 +33,16 @@
     }
     return self;
 }
-
 - (id)init {
-    [self dealloc];
     NSString *reason = @"Initialize ActiveCallViewController with initWithCallController:";
     @throw [NSException exceptionWithName:@"AKBadInitCall" reason:reason userInfo:nil];
     return nil;
 }
-
-- (void)dealloc {
-    [_enteredDTMF release];
-    [_callProgressIndicatorTrackingArea release];
-    
-    [_displayedNameField release];
-    [_statusField release];
-    [_callProgressIndicator release];
-    [_hangUpButton release];
-    
-    [super dealloc];
-}
-
 - (void)removeObservations {
     [[self displayedNameField] unbind:NSValueBinding];
     [[self statusField] unbind:NSValueBinding];
     [super removeObservations];
 }
-
 - (void)awakeFromNib {
     [[[self displayedNameField] cell] setBackgroundStyle:NSBackgroundStyleRaised];
     [[[self statusField] cell] setBackgroundStyle:NSBackgroundStyleRaised];
@@ -92,11 +60,10 @@
     
     NSUInteger trackingOptions = NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways;
     
-    NSTrackingArea *trackingArea = [[[NSTrackingArea alloc] initWithRect:trackingRect
+    NSTrackingArea *trackingArea = [[NSTrackingArea alloc] initWithRect:trackingRect
                                                                  options:trackingOptions
                                                                    owner:self
-                                                                userInfo:nil]
-                                    autorelease];
+                                                                userInfo:nil];
     
     [[self view] addTrackingArea:trackingArea];
     [self setCallProgressIndicatorTrackingArea:trackingArea];
@@ -105,19 +72,15 @@
     [[self callProgressIndicator] setTarget:self];
     [[self callProgressIndicator] setAction:@selector(hangUpCall:)];
 }
-
 - (IBAction)hangUpCall:(id)sender {
     [[self callController] hangUpCall];
 }
-
 - (IBAction)toggleCallHold:(id)sender {
     [[self callController] toggleCallHold];
 }
-
 - (IBAction)toggleMicrophoneMute:(id)sender {
     [[self callController] toggleMicrophoneMute];
 }
-
 - (IBAction)showCallTransferSheet:(id)sender {
     if (![[self callController] isCallOnHold]) {
         [[self callController] toggleCallHold];
@@ -131,7 +94,6 @@
        didEndSelector:NULL
           contextInfo:NULL];
 }
-
 - (void)startCallTimer {
     if ([self callTimer] != nil && [[self callTimer] isValid]) {
         return;
@@ -144,14 +106,12 @@
                                     userInfo:nil
                                      repeats:YES]];
 }
-
 - (void)stopCallTimer {
     if ([self callTimer] != nil) {
         [[self callTimer] invalidate];
         [self setCallTimer:nil];
     }
 }
-
 - (void)callTimerTick:(NSTimer *)theTimer {
     NSTimeInterval now = [NSDate timeIntervalSinceReferenceDate];
     NSInteger seconds = (NSInteger)(now - ([[self callController] callStartTime]));
@@ -166,7 +126,6 @@
     }
 }
 
-
 #pragma mark -
 #pragma mark NSResponder overrides
 
@@ -174,12 +133,10 @@
     [[self view] replaceSubview:[self callProgressIndicator]
                            with:[self hangUpButton]];
 }
-
 - (void)mouseExited:(NSEvent *)theEvent {
     [[self view] replaceSubview:[self hangUpButton]
                            with:[self callProgressIndicator]];
 }
-
 
 #pragma mark -
 #pragma mark AKActiveCallViewDelegate protocol
@@ -216,7 +173,6 @@
         [[[self callController] call] sendDTMFDigits:aString];
     }
 }
-
 
 #pragma mark -
 #pragma mark NSMenuValidation protocol
@@ -265,8 +221,7 @@
     } else if ([menuItem action] == @selector(hangUpCall:)) {
         [menuItem setTitle:NSLocalizedString(@"End Call", @"End Call. Call menu item.")];
     }
-    
-    return YES;
+	return YES;
 }
 
 @end
