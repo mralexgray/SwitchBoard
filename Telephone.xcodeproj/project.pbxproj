@@ -692,6 +692,7 @@
 				LastUpgradeCheck = 0500;
 				TargetAttributes = {
 					8D1107260486CEB800E47090 = {
+						DevelopmentTeam = 2E7YBEEY56;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
 								enabled = 1;
@@ -1196,12 +1197,12 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_ENTITLEMENTS = Telephone.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
-					/Users/alexei/Development/Telephone,
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
@@ -1231,24 +1232,25 @@
 					"-DNDEBUG",
 				);
 				OTHER_LDFLAGS = (
-					"-lpjsua-x86_64-apple-darwin13.3.0",
-					"-lpjsip-ua-x86_64-apple-darwin13.3.0",
-					"-lpjsip-simple-x86_64-apple-darwin13.3.0",
-					"-lpjsip-x86_64-apple-darwin13.3.0",
-					"-lpjmedia-codec-x86_64-apple-darwin13.3.0",
-					"-lpjmedia-x86_64-apple-darwin13.3.0",
-					"-lpjmedia-audiodev-x86_64-apple-darwin13.3.0",
-					"-lpjnath-x86_64-apple-darwin13.3.0",
-					"-lpjlib-util-x86_64-apple-darwin13.3.0",
-					"-lresample-x86_64-apple-darwin13.3.0",
-					"-lsrtp-x86_64-apple-darwin13.3.0",
-					"-lgsmcodec-x86_64-apple-darwin13.3.0",
-					"-lspeex-x86_64-apple-darwin13.3.0",
-					"-lilbccodec-x86_64-apple-darwin13.3.0",
-					"-lportaudio-x86_64-apple-darwin13.3.0",
-					"-lpj-x86_64-apple-darwin13.3.0",
+					"-lpjsua-x86_64-apple-darwin14.4.0",
+					"-lpjsip-ua-x86_64-apple-darwin14.4.0",
+					"-lpjsip-simple-x86_64-apple-darwin14.4.0",
+					"-lpjsip-x86_64-apple-darwin14.4.0",
+					"-lpjmedia-codec-x86_64-apple-darwin14.4.0",
+					"-lpjmedia-x86_64-apple-darwin14.4.0",
+					"-lpjmedia-audiodev-x86_64-apple-darwin14.4.0",
+					"-lpjnath-x86_64-apple-darwin14.4.0",
+					"-lpjlib-util-x86_64-apple-darwin14.4.0",
+					"-lresample-x86_64-apple-darwin14.4.0",
+					"-lsrtp-x86_64-apple-darwin14.4.0",
+					"-lgsmcodec-x86_64-apple-darwin14.4.0",
+					"-lspeex-x86_64-apple-darwin14.4.0",
+					"-lilbccodec-x86_64-apple-darwin14.4.0",
+					"-lportaudio-x86_64-apple-darwin14.4.0",
+					"-lpj-x86_64-apple-darwin14.4.0",
 				);
 				PRODUCT_NAME = Telephone;
+				SDKROOT = macosx10.9;
 			};
 			name = Debug;
 		};
@@ -1258,12 +1260,12 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_ENTITLEMENTS = Telephone.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)",
-					/Users/alexei/Development/Telephone,
 				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1291,24 +1293,25 @@
 					"-DNDEBUG",
 				);
 				OTHER_LDFLAGS = (
-					"-lpjsua-x86_64-apple-darwin13.3.0",
-					"-lpjsip-ua-x86_64-apple-darwin13.3.0",
-					"-lpjsip-simple-x86_64-apple-darwin13.3.0",
-					"-lpjsip-x86_64-apple-darwin13.3.0",
-					"-lpjmedia-codec-x86_64-apple-darwin13.3.0",
-					"-lpjmedia-x86_64-apple-darwin13.3.0",
-					"-lpjmedia-audiodev-x86_64-apple-darwin13.3.0",
-					"-lpjnath-x86_64-apple-darwin13.3.0",
-					"-lpjlib-util-x86_64-apple-darwin13.3.0",
-					"-lresample-x86_64-apple-darwin13.3.0",
-					"-lsrtp-x86_64-apple-darwin13.3.0",
-					"-lgsmcodec-x86_64-apple-darwin13.3.0",
-					"-lspeex-x86_64-apple-darwin13.3.0",
-					"-lilbccodec-x86_64-apple-darwin13.3.0",
-					"-lportaudio-x86_64-apple-darwin13.3.0",
-					"-lpj-x86_64-apple-darwin13.3.0",
+					"-lpjsua-x86_64-apple-darwin14.4.0",
+					"-lpjsip-ua-x86_64-apple-darwin14.4.0",
+					"-lpjsip-simple-x86_64-apple-darwin14.4.0",
+					"-lpjsip-x86_64-apple-darwin14.4.0",
+					"-lpjmedia-codec-x86_64-apple-darwin14.4.0",
+					"-lpjmedia-x86_64-apple-darwin14.4.0",
+					"-lpjmedia-audiodev-x86_64-apple-darwin14.4.0",
+					"-lpjnath-x86_64-apple-darwin14.4.0",
+					"-lpjlib-util-x86_64-apple-darwin14.4.0",
+					"-lresample-x86_64-apple-darwin14.4.0",
+					"-lsrtp-x86_64-apple-darwin14.4.0",
+					"-lgsmcodec-x86_64-apple-darwin14.4.0",
+					"-lspeex-x86_64-apple-darwin14.4.0",
+					"-lilbccodec-x86_64-apple-darwin14.4.0",
+					"-lportaudio-x86_64-apple-darwin14.4.0",
+					"-lpj-x86_64-apple-darwin14.4.0",
 				);
 				PRODUCT_NAME = Telephone;
+				SDKROOT = macosx10.9;
 			};
 			name = Release;
 		};
