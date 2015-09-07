@@ -41,10 +41,10 @@
 @interface CallTransferController ()
 
 // Source call controller.
-@property (nonatomic, assign) CallController *sourceCallController;
+@property (nonatomic, weak) CallController *sourceCallController;
 
 // Active account transfer view controller.
-@property (nonatomic, retain) ActiveAccountTransferViewController *activeAccountTransferViewController;
+@property (nonatomic, strong) ActiveAccountTransferViewController *activeAccountTransferViewController;
 
 // A Boolean value indicating whether the source call has been transferred.
 @property (nonatomic, assign) BOOL sourceCallTransferred;
@@ -93,11 +93,6 @@
     return self;
 }
 
-- (void)dealloc {
-    [_activeAccountTransferViewController release];
-    [super dealloc];
-}
-
 - (void)windowDidLoad {
     [self showInitialState:self];
 }
@@ -128,7 +123,7 @@
         [self patchResponderChain];
     }
     [self addViewController:[self activeAccountTransferViewController]];
-    [[self window] ak_resizeAndSwapToContentView:[[self activeAccountTransferViewController] view] animate:YES];
+    [self setCallInfoViewResizingWindow:[[self activeAccountTransferViewController] view]];
     
     if ([[[self activeAccountTransferViewController] callDestinationField] acceptsFirstResponder]) {
         [[self window] makeFirstResponder:[[self activeAccountTransferViewController] callDestinationField]];

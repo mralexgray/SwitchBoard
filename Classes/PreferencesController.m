@@ -64,6 +64,8 @@ NSString * const kPauseITunes = @"PauseITunes";
 NSString * const kAutoCloseCallWindow = @"AutoCloseCallWindow";
 NSString * const kAutoCloseMissedCallWindow = @"AutoCloseMissedCallWindow";
 NSString * const kCallWaiting = @"CallWaiting";
+NSString * const kShowGrowlNotifications = @"ShowGrowlNotifications";
+NSString * const kUseG711Only = @"UseG711Only";
 
 NSString * const kDescription = @"Description";
 NSString * const kFullName = @"FullName";
@@ -80,6 +82,8 @@ NSString * const kPlusCharacterSubstitutionString = @"PlusCharacterSubstitutionS
 NSString * const kUseProxy = @"UseProxy";
 NSString * const kProxyHost = @"ProxyHost";
 NSString * const kProxyPort = @"ProxyPort";
+NSString * const kUpdateContactHeader = @"UpdateContactHeader";
+NSString * const kUpdateViaHeader = @"UpdateViaHeader";
 
 NSString * const kSourceIndex = @"SourceIndex";
 NSString * const kDestinationIndex = @"DestinationIndex";
@@ -179,18 +183,6 @@ NSString * const AKPreferencesControllerDidChangeNetworkSettingsNotification
 
 - (void)dealloc {
     [self setDelegate:nil];
-    [_generalPreferencesViewController release];
-    [_accountPreferencesViewController release];
-    [_soundPreferencesViewController release];
-    [_networkPreferencesViewController release];
-    
-    [_toolbar release];
-    [_generalToolbarItem release];
-    [_accountsToolbarItem release];
-    [_soundToolbarItem release];
-    [_networkToolbarItem release];
-    
-    [super dealloc];
 }
 
 - (void)awakeFromNib {

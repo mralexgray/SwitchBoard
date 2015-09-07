@@ -61,21 +61,24 @@
                              object:nil];
     
     // Show user agent's current transport port as a placeholder string.
-    if ([[[NSApp delegate] userAgent] isStarted]) {
+    AKSIPUserAgent *userAgent = [AKSIPUserAgent sharedUserAgent];
+    if (userAgent.isStarted) {
         [[[self transportPortField] cell] setPlaceholderString:
-         [[NSNumber numberWithUnsignedInteger:[[[NSApp delegate] userAgent] transportPort]] stringValue]];
+         [NSString stringWithFormat:@"%lu", (unsigned long)userAgent.transportPort]];
     }
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
-    if ([defaults integerForKey:kTransportPort] > 0) {
-        [[self transportPortField] setIntegerValue:[defaults integerForKey:kTransportPort]];
+    NSInteger transportPort = [defaults integerForKey:kTransportPort];
+    if (transportPort > 0) {
+        [[self transportPortField] setStringValue:[NSString stringWithFormat:@"%ld", (long)transportPort]];
     }
     
     [[self STUNServerHostField] setStringValue:[defaults stringForKey:kSTUNServerHost]];
     
-    if ([defaults integerForKey:kSTUNServerPort] > 0) {
-        [[self STUNServerPortField] setIntegerValue:[defaults integerForKey:kSTUNServerPort]];
+    NSInteger STUNServerPort = [defaults integerForKey:kSTUNServerPort];
+    if (STUNServerPort > 0) {
+        [[self STUNServerPortField] setStringValue:[NSString stringWithFormat:@"%ld", (long)STUNServerPort]];
     }
     
     [[self useICECheckBox] setState:[defaults integerForKey:kUseICE]];
@@ -84,23 +87,14 @@
     
     [[self outboundProxyHostField] setStringValue:[defaults stringForKey:kOutboundProxyHost]];
     
-    if ([defaults integerForKey:kOutboundProxyPort] > 0) {
-        [[self outboundProxyPortField] setIntegerValue:[defaults integerForKey:kOutboundProxyPort]];
+    NSInteger outboundProxyPort = [defaults integerForKey:kOutboundProxyPort];
+    if (outboundProxyPort > 0) {
+        [[self outboundProxyPortField] setStringValue:[NSString stringWithFormat:@"%ld", (long)outboundProxyPort]];
     }
 }
 
 - (void)dealloc {
-    [_transportPortField release];
-    [_STUNServerHostField release];
-    [_STUNServerPortField release];
-    [_useICECheckBox release];
-    [_useDNSSRVCheckBox release];
-    [_outboundProxyHostField release];
-    [_outboundProxyPortField release];
-    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
-    [super dealloc];
 }
 
 - (BOOL)checkForNetworkSettingsChanges:(id)sender {
@@ -128,7 +122,7 @@
         [[[self preferencesController] toolbar] setSelectedItemIdentifier:
          [[[self preferencesController] networkToolbarItem] itemIdentifier]];
         
-        NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+        NSAlert *alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle:NSLocalizedString(@"Save", @"Save button.")];
         [alert addButtonWithTitle:NSLocalizedString(@"Cancel", @"Cancel button.")];
         [alert addButtonWithTitle:NSLocalizedString(@"Don't Save", @"Don't save button.")];
@@ -142,7 +136,7 @@
         [alert beginSheetModalForWindow:[[self preferencesController] window]
                           modalDelegate:self
                          didEndSelector:@selector(networkSettingsChangeAlertDidEnd:returnCode:contextInfo:)
-                            contextInfo:sender];
+                            contextInfo:(__bridge void *)(sender)];
         return YES;
     }
     
@@ -158,7 +152,7 @@
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSCharacterSet *spacesSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-    id sender = (id)contextInfo;
+    id sender = (__bridge id)contextInfo;
     
     if (returnCode == NSAlertFirstButtonReturn) {
         [[[self transportPortField] cell] setPlaceholderString:[[self transportPortField] stringValue]];
@@ -187,18 +181,20 @@
                        object:[self preferencesController]];
         
     } else if (returnCode == NSAlertThirdButtonReturn) {
-        if ([defaults integerForKey:kTransportPort] == 0) {
+        NSInteger transportPort = [defaults integerForKey:kTransportPort];
+        if (transportPort == 0) {
             [[self transportPortField] setStringValue:@""];
         } else {
-            [[self transportPortField] setIntegerValue:[defaults integerForKey:kTransportPort]];
+            [[self transportPortField] setStringValue:[NSString stringWithFormat:@"%ld", (long)transportPort]];
         }
         
         [[self STUNServerHostField] setStringValue:[defaults stringForKey:kSTUNServerHost]];
         
-        if ([defaults integerForKey:kSTUNServerPort] == 0) {
+        NSInteger STUNServerPort = [defaults integerForKey:kSTUNServerPort];
+        if (STUNServerPort == 0) {
             [[self STUNServerPortField] setStringValue:@""];
         } else {
-            [[self STUNServerPortField] setIntegerValue:[defaults integerForKey:kSTUNServerPort]];
+            [[self STUNServerPortField] setStringValue:[NSString stringWithFormat:@"%ld", (long)STUNServerPort]];
         }
         
         [[self useICECheckBox] setState:[defaults integerForKey:kUseICE]];
@@ -207,10 +203,11 @@
         
         [[self outboundProxyHostField] setStringValue:[defaults stringForKey:kOutboundProxyHost]];
         
-        if ([defaults integerForKey:kOutboundProxyPort] == 0) {
+        NSInteger outboundProxyPort = [defaults integerForKey:kOutboundProxyPort];
+        if (outboundProxyPort == 0) {
             [[self outboundProxyPortField] setStringValue:@""];
         } else {
-            [[self outboundProxyPortField] setIntegerValue:[defaults integerForKey:kOutboundProxyPort]];
+            [[self outboundProxyPortField] setStringValue:[NSString stringWithFormat:@"%ld", (long)outboundProxyPort]];
         }
     }
     
@@ -227,13 +224,14 @@
 #pragma mark AKSIPUserAgent notifications
 
 - (void)SIPUserAgentDidFinishStarting:(NSNotification *)notification {
-    if (![[[NSApp delegate] userAgent] isStarted]) {
+    AKSIPUserAgent *userAgent = [AKSIPUserAgent sharedUserAgent];
+    if (!userAgent.isStarted) {
         return;
     }
     
     // Show transport port in the network preferences as a placeholder string.
     [[[self transportPortField] cell] setPlaceholderString:
-     [[NSNumber numberWithUnsignedInteger:[[[NSApp delegate] userAgent] transportPort]] stringValue]];
+     [NSString stringWithFormat:@"%lu", (unsigned long)userAgent.transportPort]];
 }
 
 @end

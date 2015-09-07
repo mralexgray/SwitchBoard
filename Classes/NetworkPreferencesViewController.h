@@ -37,16 +37,16 @@
 @interface NetworkPreferencesViewController : NSViewController
 
 // Preferences controller the receiver belongs to.
-@property (nonatomic, assign) PreferencesController *preferencesController;
+@property (nonatomic, weak) PreferencesController *preferencesController;
 
 // Outlets.
-@property (nonatomic, retain) IBOutlet NSTextField *transportPortField;
-@property (nonatomic, retain) IBOutlet NSTextField *STUNServerHostField;
-@property (nonatomic, retain) IBOutlet NSTextField *STUNServerPortField;
-@property (nonatomic, retain) IBOutlet NSButton *useICECheckBox;
-@property (nonatomic, retain) IBOutlet NSButton *useDNSSRVCheckBox;
-@property (nonatomic, retain) IBOutlet NSTextField *outboundProxyHostField;
-@property (nonatomic, retain) IBOutlet NSTextField *outboundProxyPortField;
+@property (nonatomic, weak) IBOutlet NSTextField *transportPortField;
+@property (nonatomic, weak) IBOutlet NSTextField *STUNServerHostField;
+@property (nonatomic, weak) IBOutlet NSTextField *STUNServerPortField;
+@property (nonatomic, weak) IBOutlet NSButton *useICECheckBox;
+@property (nonatomic, weak) IBOutlet NSButton *useDNSSRVCheckBox;
+@property (nonatomic, weak) IBOutlet NSTextField *outboundProxyHostField;
+@property (nonatomic, weak) IBOutlet NSTextField *outboundProxyPortField;
 
 // Returns YES if network settings have been changed.
 - (BOOL)checkForNetworkSettingsChanges:(id)sender;

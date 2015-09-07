@@ -60,6 +60,8 @@ extern NSString * const AKSIPAccountWillMakeCallNotification;
 @interface AKSIPAccount : NSObject
 
 // The receiver's delegate.
+// |assign| instead of |weak| because possible candidates for delegate, i.e. NSWindowController and NSViewController,
+// don't support weak references in 10.7.
 @property (nonatomic, assign) NSObject <AKSIPAccountDelegate> *delegate;
 
 // The URI for SIP registration.
@@ -93,6 +95,17 @@ extern NSString * const AKSIPAccountWillMakeCallNotification;
 // Default: 300 (sec).
 @property (nonatomic, assign) NSUInteger reregistrationTime;
 
+/// A Boolean value indicating if Contact header should be automatically updated.
+///
+/// When YES, the library will keep track of the public IP address from the response of the REGISTER request.
+@property (nonatomic, assign) BOOL updatesContactHeader;
+
+/// A Boolean value indicating if Via header should be automatically updated.
+///
+/// When YES, the "sent-by" field of the Via header will be overwritten for outgoing messages with the same interface
+/// address as the one in the REGISTER request.
+@property (nonatomic, assign) BOOL updatesViaHeader;
+
 // The receiver's identifier at the user agent.
 @property (nonatomic, assign) NSInteger identifier;
 
@@ -116,7 +129,7 @@ extern NSString * const AKSIPAccountWillMakeCallNotification;
 @property (nonatomic, readonly, copy) NSString *onlineStatusText;
 
 // Calls that belong to the receiver.
-@property (readonly, retain) NSMutableArray *calls;
+@property (nonatomic, readonly, strong) NSMutableArray *calls;
 
 // Creates and returns an AKSIPAccount object initialized with a given full name, SIP address, registrar, realm, and
 // user name.

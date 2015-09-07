@@ -62,6 +62,12 @@ static const NSTimeInterval kRedialButtonReenableTime = 1.0;
 
 @interface CallController ()
 
+// Account description field.
+@property(nonatomic, weak) IBOutlet NSTextField *accountDescriptionField;
+
+// Call info view.
+@property(nonatomic, strong) NSView *callInfoView;
+
 // Closes call window.
 - (void)closeCallWindow;
 
@@ -78,8 +84,7 @@ static const NSTimeInterval kRedialButtonReenableTime = 1.0;
             [_call setDelegate:nil];
         }
         
-        [_call release];
-        _call = [aCall retain];
+        _call = aCall;
         
         [_call setDelegate:self];
     }
@@ -161,26 +166,60 @@ static const NSTimeInterval kRedialButtonReenableTime = 1.0;
 }
 
 - (void)dealloc {
-    [_identifier release];
-    
     [self setCall:nil];
     [self setAccountController:nil];
-    [_callTransferController release];
-    [_incomingCallViewController release];
-    [_activeCallViewController release];
-    [_endedCallViewController release];
-    [_displayedName release];
-    [_status release];
-    [_nameFromAddressBook release];
-    [_phoneLabelFromAddressBook release];
-    [_enteredCallDestination release];
-    [_redialURI release];
-    
-    [super dealloc];
 }
 
 - (NSString *)description {
     return [[self call] description];
+}
+
+- (void)awakeFromNib {
+    [[[self accountDescriptionField] cell] setBackgroundStyle:NSBackgroundStyleRaised];
+    
+    NSRect frame = [[[self window] contentView] frame];
+    frame.origin.x = 0.0;
+    CGFloat minYBorderThickness = [[self window] contentBorderThicknessForEdge:NSMinYEdge];
+    frame.origin.y = minYBorderThickness;
+    frame.size.height -= minYBorderThickness;
+    NSView *emptyCallInfoView = [[NSView alloc] initWithFrame:frame];
+    [self.window.contentView addSubview:emptyCallInfoView];
+    self.callInfoView = emptyCallInfoView;
+}
+
+- (void)setCallInfoViewResizingWindow:(NSView *)newView {
+    // Compute view size delta.
+    NSSize currentCallInfoViewSize = [[self callInfoView] frame].size;
+    NSSize newViewSize = [newView frame].size;
+    CGFloat deltaWidth = newViewSize.width - currentCallInfoViewSize.width;
+    CGFloat deltaHeight = newViewSize.height - currentCallInfoViewSize.height;
+    
+    if (currentCallInfoViewSize.width > 0.0 && currentCallInfoViewSize.height > 0.0 &&
+        (fabs(deltaWidth) > 0.1 || fabs(deltaHeight) > 0.1)) {
+        // Compute new window size.
+        NSRect windowFrame = [[self window] frame];
+        windowFrame.size.height += deltaHeight;
+        windowFrame.origin.y -= deltaHeight;
+        windowFrame.size.width += deltaWidth;
+        
+        // Set new window frame.
+        [[self window] setFrame:windowFrame display:YES animate:YES];
+    }
+    
+    CGFloat minYBorderThickness = [[self window] contentBorderThicknessForEdge:NSMinYEdge];
+    if (minYBorderThickness > 0.0) {
+        CGRect newViewFrame = [newView frame];
+        newViewFrame.origin.y = minYBorderThickness;
+        newView.frame = newViewFrame;
+    }
+    
+    // Swap to the new view.
+    if (self.callInfoView == nil) {
+        [self.window.contentView addSubview:newView];
+    } else {
+        [self.window.contentView replaceSubview:self.callInfoView with:newView];
+    }
+    self.callInfoView = newView;
 }
 
 - (void)acceptCall {
@@ -219,7 +258,7 @@ static const NSTimeInterval kRedialButtonReenableTime = 1.0;
     
     [self removeObjectFromViewControllersAtIndex:0];
     [self addViewController:[self endedCallViewController]];
-    [[self window] ak_resizeAndSwapToContentView:[[self endedCallViewController] view] animate:YES];
+    [self setCallInfoViewResizingWindow:[[self endedCallViewController] view]];
     
     [[[self activeCallViewController] callProgressIndicator] stopAnimation:self];
     [[[self activeCallViewController] hangUpButton] setEnabled:NO];
@@ -267,7 +306,7 @@ static const NSTimeInterval kRedialButtonReenableTime = 1.0;
     if (![[self objectInViewControllersAtIndex:0] isEqual:[self activeCallViewController]]) {
         [self removeObjectFromViewControllersAtIndex:0];
         [self addViewController:[self activeCallViewController]];
-        [[self window] ak_resizeAndSwapToContentView:[[self activeCallViewController] view] animate:YES];
+        [self setCallInfoViewResizingWindow:[[self activeCallViewController] view]];
     }
     
     [[[self activeCallViewController] view] replaceSubview:[[self activeCallViewController] hangUpButton]
@@ -312,7 +351,7 @@ static const NSTimeInterval kRedialButtonReenableTime = 1.0;
         if (![[self objectInViewControllersAtIndex:0] isEqual:[self endedCallViewController]]) {
             [self removeObjectFromViewControllersAtIndex:0];
             [self addViewController:[self endedCallViewController]];
-            [[self window] ak_resizeAndSwapToContentView:[[self endedCallViewController] view] animate:YES];
+            [self setCallInfoViewResizingWindow:[[self endedCallViewController] view]];
         }
         [self setStatus:NSLocalizedString(@"Call Failed", @"Call failed.")];
     }
@@ -390,12 +429,8 @@ static const NSTimeInterval kRedialButtonReenableTime = 1.0;
 #pragma mark NSWindow delegate methods
 
 - (void)windowWillClose:(NSNotification *)notification {
-    if ([XSWindowController instancesRespondToSelector:@selector(windowWillClose:)]) {
-        // We have to call super's implementation of |windowWillClose:| via the function pointer because using
-        // [super windowWillClose:notification] will issue compiler warning.
-        id (*superWindowWillClose)(id, SEL, ...) = [XSWindowController instanceMethodForSelector:_cmd];
-        superWindowWillClose(self, _cmd);
-    }
+    [super windowWillClose:notification];
+    
     if ([self isCallActive]) {
         [self setCallActive:NO];
         [[self activeCallViewController] stopCallTimer];
@@ -417,6 +452,13 @@ static const NSTimeInterval kRedialButtonReenableTime = 1.0;
     [[NSApp delegate] updateDockTileBadgeLabel];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:AKCallWindowWillCloseNotification object:self];
+    
+    // View controllers must be nullified because of bindings to callController's |displayedName| and |status|. When
+    // this is done in -dealloc this is already too late, and KVO error about releaseing an object that is still being
+    // observied is issued.
+    _incomingCallViewController = nil;
+    _activeCallViewController = nil;
+    _endedCallViewController = nil;
 }
 
 
@@ -437,7 +479,7 @@ static const NSTimeInterval kRedialButtonReenableTime = 1.0;
     if (![[self objectInViewControllersAtIndex:0] isEqual:[self activeCallViewController]]) {
         [self removeObjectFromViewControllersAtIndex:0];
         [self addViewController:[self activeCallViewController]];
-        [[self window] ak_resizeAndSwapToContentView:[[self activeCallViewController] view] animate:YES];
+        [self setCallInfoViewResizingWindow:[[self activeCallViewController] view]];
     }
     
     [[[self activeCallViewController] hangUpButton] setEnabled:YES];
@@ -466,7 +508,7 @@ static const NSTimeInterval kRedialButtonReenableTime = 1.0;
         if (![[self objectInViewControllersAtIndex:0] isEqual:[self activeCallViewController]]) {
             [self removeObjectFromViewControllersAtIndex:0];
             [self addViewController:[self activeCallViewController]];
-            [[self window] ak_resizeAndSwapToContentView:[[self activeCallViewController] view] animate:YES];
+            [self setCallInfoViewResizingWindow:[[self activeCallViewController] view]];
         }
     }
     
@@ -498,7 +540,7 @@ static const NSTimeInterval kRedialButtonReenableTime = 1.0;
     if (![[self objectInViewControllersAtIndex:0] isEqual:[self activeCallViewController]]) {
         [self removeObjectFromViewControllersAtIndex:0];
         [self addViewController:[self activeCallViewController]];
-        [[self window] ak_resizeAndSwapToContentView:[[self activeCallViewController] view] animate:YES];
+        [self setCallInfoViewResizingWindow:[[self activeCallViewController] view]];
     }
     
     if ([[[self activeCallViewController] view] acceptsFirstResponder]) {
@@ -554,15 +596,15 @@ static const NSTimeInterval kRedialButtonReenableTime = 1.0;
             break;
     }
     
-    // Disable the redial button to re-enable it after some delay to prevent accidental clicking on in instead of
-    // clicking on the hang-up button. Don't forget to re-enable it below!
-    [[[self endedCallViewController] redialButton] setEnabled:NO];
-    
     if (![[self objectInViewControllersAtIndex:0] isEqual:[self endedCallViewController]]) {
         [self removeObjectFromViewControllersAtIndex:0];
         [self addViewController:[self endedCallViewController]];
-        [[self window] ak_resizeAndSwapToContentView:[[self endedCallViewController] view] animate:YES];
+        [self setCallInfoViewResizingWindow:[[self endedCallViewController] view]];
     }
+    
+    // Disable the redial button to re-enable it after some delay to prevent accidental clicking on in instead of
+    // clicking on the hang-up button. Don't forget to re-enable it below!
+    [[[self endedCallViewController] redialButton] setEnabled:NO];
     
     [[[self activeCallViewController] callProgressIndicator] stopAnimation:self];
     [[[self activeCallViewController] hangUpButton] setEnabled:NO];
@@ -577,7 +619,7 @@ static const NSTimeInterval kRedialButtonReenableTime = 1.0;
     
     [[NSApp delegate] resumeITunesIfNeeded];
     
-    // Show Growl notification.
+    // Show user notification.
     
     NSString *notificationTitle;
     
@@ -586,7 +628,7 @@ static const NSTimeInterval kRedialButtonReenableTime = 1.0;
         
     } else if ([[self enteredCallDestination] length] > 0) {
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        AKTelephoneNumberFormatter *telephoneNumberFormatter = [[[AKTelephoneNumberFormatter alloc] init] autorelease];
+        AKTelephoneNumberFormatter *telephoneNumberFormatter = [[AKTelephoneNumberFormatter alloc] init];
         
         if ([[self enteredCallDestination] ak_isTelephoneNumber] && [defaults boolForKey:kFormatTelephoneNumbers]) {
             notificationTitle = [telephoneNumberFormatter stringForObjectValue:[self enteredCallDestination]];
@@ -594,7 +636,7 @@ static const NSTimeInterval kRedialButtonReenableTime = 1.0;
             notificationTitle = [self enteredCallDestination];
         }
     } else {
-        AKSIPURIFormatter *SIPURIFormatter = [[[AKSIPURIFormatter alloc] init] autorelease];
+        AKSIPURIFormatter *SIPURIFormatter = [[AKSIPURIFormatter alloc] init];
         NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
         [SIPURIFormatter setFormatsTelephoneNumbers:[defaults boolForKey:kFormatTelephoneNumbers]];
         [SIPURIFormatter setTelephoneNumberFormatterSplitsLastFourDigits:
@@ -603,13 +645,21 @@ static const NSTimeInterval kRedialButtonReenableTime = 1.0;
     }
     
     if (![NSApp isActive]) {
-        [GrowlApplicationBridge notifyWithTitle:notificationTitle
-                                    description:[self status]
-                               notificationName:kGrowlNotificationCallEnded
-                                       iconData:nil
-                                       priority:0
-                                       isSticky:NO
-                                   clickContext:[self identifier]];
+        NSUserNotification *userNotification = [[NSUserNotification alloc] init];
+        userNotification.title = notificationTitle;
+        userNotification.informativeText = self.status;
+        userNotification.userInfo = @{kUserNotificationCallControllerIdentifierKey: self.identifier};
+        [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:userNotification];
+        
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:kShowGrowlNotifications]) {
+            [GrowlApplicationBridge notifyWithTitle:notificationTitle
+                                        description:[self status]
+                                   notificationName:kGrowlNotificationCallEnded
+                                           iconData:nil
+                                           priority:0
+                                           isSticky:NO
+                                       clickContext:[self identifier]];
+        }
     }
     
     // Optionally close disconnected call window.

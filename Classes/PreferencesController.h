@@ -66,6 +66,8 @@ extern NSString * const kPauseITunes;
 extern NSString * const kAutoCloseCallWindow;
 extern NSString * const kAutoCloseMissedCallWindow;
 extern NSString * const kCallWaiting;
+extern NSString * const kShowGrowlNotifications;
+extern NSString * const kUseG711Only;
 //
 // Account keys
 extern NSString * const kDescription;
@@ -83,6 +85,8 @@ extern NSString * const kPlusCharacterSubstitutionString;
 extern NSString * const kUseProxy;
 extern NSString * const kProxyHost;
 extern NSString * const kProxyPort;
+extern NSString * const kUpdateContactHeader;
+extern NSString * const kUpdateViaHeader;
 
 extern NSString * const kSourceIndex;
 extern NSString * const kDestinationIndex;
@@ -111,6 +115,8 @@ extern NSString * const AKPreferencesControllerDidChangeNetworkSettingsNotificat
 @interface PreferencesController : NSWindowController
 
 // The receiver's delegate.
+// |assign| instead of |weak| because possible candidates for delegate, i.e. NSWindowController and NSViewController,
+// don't support weak references in 10.7.
 @property (nonatomic, assign) id delegate;
 
 // General preferences view controller.
@@ -127,11 +133,11 @@ extern NSString * const AKPreferencesControllerDidChangeNetworkSettingsNotificat
 
 // Outlets.
 //
-@property (nonatomic, retain) IBOutlet NSToolbar *toolbar;
-@property (nonatomic, retain) IBOutlet NSToolbarItem *generalToolbarItem;
-@property (nonatomic, retain) IBOutlet NSToolbarItem *accountsToolbarItem;
-@property (nonatomic, retain) IBOutlet NSToolbarItem *soundToolbarItem;
-@property (nonatomic, retain) IBOutlet NSToolbarItem *networkToolbarItem;
+@property (nonatomic, weak) IBOutlet NSToolbar *toolbar;
+@property (nonatomic, weak) IBOutlet NSToolbarItem *generalToolbarItem;
+@property (nonatomic, weak) IBOutlet NSToolbarItem *accountsToolbarItem;
+@property (nonatomic, weak) IBOutlet NSToolbarItem *soundToolbarItem;
+@property (nonatomic, weak) IBOutlet NSToolbarItem *networkToolbarItem;
 
 // Changes window's content view.
 - (IBAction)changeView:(id)sender;

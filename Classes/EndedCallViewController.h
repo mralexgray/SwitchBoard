@@ -38,17 +38,17 @@
 @interface EndedCallViewController : XSViewController
 
 // Call controller the receiver belongs to.
-@property (nonatomic, assign) CallController *callController;
+@property (nonatomic, weak) CallController *callController;
 
 
 // Display Name field outlet.
-@property (nonatomic, retain) IBOutlet NSTextField *displayedNameField;
+@property (nonatomic, weak) IBOutlet NSTextField *displayedNameField;
 
 // Status field outlet.
-@property (nonatomic, retain) IBOutlet NSTextField *statusField;
+@property (nonatomic, weak) IBOutlet NSTextField *statusField;
 
 // Redial button outlet.
-@property (nonatomic, retain) IBOutlet NSButton *redialButton;
+@property (nonatomic, weak) IBOutlet NSButton *redialButton;
 
 
 // Designated initializer.

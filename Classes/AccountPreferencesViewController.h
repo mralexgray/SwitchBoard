@@ -37,29 +37,30 @@
 @interface AccountPreferencesViewController : NSViewController
 
 // Preferences controller the receiver belongs to.
-@property (nonatomic, assign) PreferencesController *preferencesController;
+@property (nonatomic, weak) PreferencesController *preferencesController;
 
 // Account setup controller.
 @property (nonatomic, readonly) AccountSetupController *accountSetupController;
 
 // Outlets.
-@property (nonatomic, retain) IBOutlet NSTableView *accountsTable;
-@property (nonatomic, retain) IBOutlet NSButton *addAccountButton;
-@property (nonatomic, retain) IBOutlet NSButton *accountEnabledCheckBox;
-@property (nonatomic, retain) IBOutlet NSTextField *accountDescriptionField;
-@property (nonatomic, retain) IBOutlet NSTextField *fullNameField;
-@property (nonatomic, retain) IBOutlet NSTextField *domainField;
-@property (nonatomic, retain) IBOutlet NSTextField *usernameField;
-@property (nonatomic, retain) IBOutlet NSTextField *passwordField;
-@property (nonatomic, retain) IBOutlet NSTextField *reregistrationTimeField;
-@property (nonatomic, retain) IBOutlet NSButton *substitutePlusCharacterCheckBox;
-@property (nonatomic, retain) IBOutlet NSTextField *plusCharacterSubstitutionField;
-@property (nonatomic, retain) IBOutlet NSButton *useProxyCheckBox;
-@property (nonatomic, retain) IBOutlet NSTextField *proxyHostField;
-@property (nonatomic, retain) IBOutlet NSTextField *proxyPortField;
-@property (nonatomic, retain) IBOutlet NSTextField *SIPAddressField;
-@property (nonatomic, retain) IBOutlet NSTextField *registrarField;
-@property (nonatomic, retain) IBOutlet NSTextField *cantEditAccountLabel;
+@property (nonatomic, weak) IBOutlet NSTableView *accountsTable;
+@property (nonatomic, weak) IBOutlet NSButton *addAccountButton;
+@property (nonatomic, weak) IBOutlet NSButton *accountEnabledCheckBox;
+@property (nonatomic, weak) IBOutlet NSTextField *accountDescriptionField;
+@property (nonatomic, weak) IBOutlet NSTextField *fullNameField;
+@property (nonatomic, weak) IBOutlet NSTextField *domainField;
+@property (nonatomic, weak) IBOutlet NSTextField *usernameField;
+@property (nonatomic, weak) IBOutlet NSTextField *passwordField;
+@property (nonatomic, weak) IBOutlet NSTextField *reregistrationTimeField;
+@property (nonatomic, weak) IBOutlet NSButton *substitutePlusCharacterCheckBox;
+@property (nonatomic, weak) IBOutlet NSTextField *plusCharacterSubstitutionField;
+@property (nonatomic, weak) IBOutlet NSButton *useProxyCheckBox;
+@property (nonatomic, weak) IBOutlet NSTextField *proxyHostField;
+@property (nonatomic, weak) IBOutlet NSTextField *proxyPortField;
+@property (nonatomic, weak) IBOutlet NSTextField *SIPAddressField;
+@property (nonatomic, weak) IBOutlet NSTextField *registrarField;
+@property (nonatomic, weak) IBOutlet NSTextField *cantEditAccountLabel;
+@property (nonatomic, weak) IBOutlet NSButton *updateHeadersCheckBox;
 
 // Raises |Add Account| sheet.
 - (IBAction)showAddAccountSheet:(id)sender;

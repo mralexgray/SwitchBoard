@@ -4,7 +4,7 @@ appropriate SIP provider. If your office or home phone works via SIP,
 you can use that phone number on your Mac anywhere you have decent
 internet connection.
 
-Building
+Building (xcode 6 on 10.10)
 --------
 
 Telephone's SIP user agent is based on [pjsip][]. You need to build it
@@ -13,12 +13,14 @@ near Telephone, in the same parent directory.
 
   [pjsip]: http://www.pjsip.org/
 
-    $ svn checkout http://svn.pjsip.org/repos/pjproject/tags/1.12 pjproject
+    $ svn checkout http://svn.pjsip.org/repos/pjproject/tags/2.4 pjproject
     $ cd pjproject
 
 Create the file `pjlib/include/pj/config_site.h` with the following
-contents.
+contents:
 
+    #define PJMEDIA_AUDIO_DEV_HAS_PORTAUDIO 0
+    #define PJMEDIA_AUDIO_DEV_HAS_COREAUDIO 1
     #define PJSIP_DONT_SWITCH_TO_TCP 1
     #define PJSUA_MAX_ACC 32
     #define PJMEDIA_RTP_PT_TELEPHONE_EVENTS 101
@@ -27,10 +29,12 @@ contents.
     #define PJ_DNS_SRV_MAX_ADDR 32
     #define PJSIP_MAX_RESOLVED_ADDRESSES 32
 
-Configure and build Telephone    
+Configure and build pjsip:
 
-    $ CFLAGS="-O2 -arch i386 -arch x86_64" ./configure --disable-ssl
-    $ make
+    $ CFLAGS="-mmacosx-version-min=10.8" ./configure
+    $ make lib
+    
+Build Telephone.
 
 Coding Style
 ------------

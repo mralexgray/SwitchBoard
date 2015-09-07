@@ -226,14 +226,6 @@ NSString * const AKSIPCallTransferStatusDidChangeNotification = @"AKSIPCallTrans
     }
     
     [self setDelegate:nil];
-    
-    [_localURI release];
-    [_remoteURI release];
-    [_stateText release];
-    [_lastStatusText release];
-    [_transferStatusText release];
-    
-    [super dealloc];
 }
 
 - (NSString *)description {
@@ -288,40 +280,6 @@ NSString * const AKSIPCallTransferStatusDidChangeNotification = @"AKSIPCallTrans
     pj_status_t status = pjsua_call_answer([self identifier], PJSIP_SC_BUSY_HERE, NULL, NULL);
     if (status != PJ_SUCCESS) {
         NSLog(@"Error replying with 486 Busy Here");
-    }
-}
-
-- (void)ringbackStart {
-    AKSIPUserAgent *userAgent = [AKSIPUserAgent sharedUserAgent];
-    
-    // Use dot syntax for properties to prevent square bracket clutter.
-    if (userAgent.callData[self.identifier].ringbackOn) {
-        return;
-    }
-    
-    userAgent.callData[self.identifier].ringbackOn = PJ_TRUE;
-    
-    [userAgent setRingbackCount:[userAgent ringbackCount] + 1];
-    if ([userAgent ringbackCount] == 1 && [userAgent ringbackSlot] != kAKSIPUserAgentInvalidIdentifier) {
-        pjsua_conf_connect([userAgent ringbackSlot], 0);
-    }
-}
-
-- (void)ringbackStop {
-    AKSIPUserAgent *userAgent = [AKSIPUserAgent sharedUserAgent];
-    
-    // Use dot syntax for properties to prevent square bracket clutter.
-    if (userAgent.callData[self.identifier].ringbackOn) {
-        userAgent.callData[self.identifier].ringbackOn = PJ_FALSE;
-        
-        pj_assert([userAgent ringbackCount] > 0);
-        
-        [userAgent setRingbackCount:[userAgent ringbackCount] - 1];
-        if ([userAgent ringbackCount] == 0 &&
-            [userAgent ringbackSlot] != kAKSIPUserAgentInvalidIdentifier) {
-            pjsua_conf_disconnect([userAgent ringbackSlot], 0);
-            pjmedia_tonegen_rewind([userAgent ringbackPort]);
-        }
     }
 }
 

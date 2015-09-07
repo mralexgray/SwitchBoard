@@ -52,22 +52,9 @@
 }
 
 - (id)init {
-    [self dealloc];
     NSString *reason = @"Initialize ActiveCallViewController with initWithCallController:";
     @throw [NSException exceptionWithName:@"AKBadInitCall" reason:reason userInfo:nil];
     return nil;
-}
-
-- (void)dealloc {
-    [_enteredDTMF release];
-    [_callProgressIndicatorTrackingArea release];
-    
-    [_displayedNameField release];
-    [_statusField release];
-    [_callProgressIndicator release];
-    [_hangUpButton release];
-    
-    [super dealloc];
 }
 
 - (void)removeObservations {
@@ -93,11 +80,10 @@
     
     NSUInteger trackingOptions = NSTrackingMouseEnteredAndExited | NSTrackingActiveAlways;
     
-    NSTrackingArea *trackingArea = [[[NSTrackingArea alloc] initWithRect:trackingRect
+    NSTrackingArea *trackingArea = [[NSTrackingArea alloc] initWithRect:trackingRect
                                                                  options:trackingOptions
                                                                    owner:self
-                                                                userInfo:nil]
-                                    autorelease];
+                                                                userInfo:nil];
     
     [[self view] addTrackingArea:trackingArea];
     [self setCallProgressIndicatorTrackingArea:trackingArea];
@@ -186,7 +172,7 @@
 #pragma mark AKActiveCallViewDelegate protocol
 
 - (void)activeCallView:(AKActiveCallView *)sender didReceiveText:(NSString *)aString {
-    NSCharacterSet *DTMFCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"0123456789*#"];
+    NSCharacterSet *DTMFCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"0123456789*#abcdABCD"];
     
     BOOL isDTMFValid = YES;
     for (NSUInteger i = 0; i < [aString length]; ++i) {

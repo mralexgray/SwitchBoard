@@ -99,6 +99,8 @@ extern NSString * const AKSIPCallTransferStatusDidChangeNotification;
 @interface AKSIPCall : NSObject
 
 // The receiver's delegate.
+// |assign| instead of |weak| because possible candidates for delegate, i.e. NSWindowController and NSViewController,
+// don't support weak references in 10.7.
 @property (nonatomic, assign) id delegate;
 
 // The receiver's identifier.
@@ -151,7 +153,7 @@ extern NSString * const AKSIPCallTransferStatusDidChangeNotification;
 @property (nonatomic, readonly, assign, getter=isOnRemoteHold) BOOL onRemoteHold;
 
 // The account the call belongs to.
-@property (nonatomic, assign) AKSIPAccount *account;
+@property (nonatomic, weak) AKSIPAccount *account;
 
 // Designated initializer.
 // Initializes a AKSIPCall object with a given SIP account and identifier.
@@ -177,12 +179,6 @@ extern NSString * const AKSIPCallTransferStatusDidChangeNotification;
 
 // Replies with 486 Busy Here.
 - (void)replyWithBusyHere;
-
-// Starts local ringback sound.
-- (void)ringbackStart;
-
-// Stops local ringback sound.
-- (void)ringbackStop;
 
 // Sends DTMF.
 - (void)sendDTMFDigits:(NSString *)digits;

@@ -86,27 +86,7 @@ static const NSUInteger kAccountsMax = 32;
 }
 
 - (void)dealloc {
-    [_accountsTable release];
-    [_addAccountButton release];
-    [_accountEnabledCheckBox release];
-    [_accountDescriptionField release];
-    [_fullNameField release];
-    [_domainField release];
-    [_usernameField release];
-    [_passwordField release];
-    [_reregistrationTimeField release];
-    [_substitutePlusCharacterCheckBox release];
-    [_plusCharacterSubstitutionField release];
-    [_useProxyCheckBox release];
-    [_proxyHostField release];
-    [_proxyPortField release];
-    [_SIPAddressField release];
-    [_registrarField release];
-    [_cantEditAccountLabel release];
-    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
-    [super dealloc];
 }
 
 - (IBAction)showAddAccountSheet:(id)sender {
@@ -137,12 +117,12 @@ static const NSUInteger kAccountsMax = 32;
         return;
     }
     
-    NSTableColumn *theColumn = [[[NSTableColumn alloc] initWithIdentifier:@"SIPAddress"] autorelease];
+    NSTableColumn *theColumn = [[NSTableColumn alloc] initWithIdentifier:@"SIPAddress"];
     NSString *selectedAccount = [[[self accountsTable] dataSource] tableView:[self accountsTable]
                                                    objectValueForTableColumn:theColumn
                                                                          row:index];
     
-    NSAlert *alert = [[[NSAlert alloc] init] autorelease];
+    NSAlert *alert = [[NSAlert alloc] init];
     [alert addButtonWithTitle:NSLocalizedString(@"Delete", @"Delete button.")];
     [alert addButtonWithTitle:NSLocalizedString(@"Cancel", @"Cancel button.")];
     [[[alert buttons] objectAtIndex:1] setKeyEquivalent:@"\033"];
@@ -232,6 +212,7 @@ static const NSUInteger kAccountsMax = 32;
             [[self SIPAddressField] setEnabled:NO];
             [[self registrarField] setEnabled:NO];
             [[self cantEditAccountLabel] setHidden:NO];
+            [[self updateHeadersCheckBox] setEnabled:NO];
             
         } else {
             [[self accountEnabledCheckBox] setState:NSOffState];
@@ -265,6 +246,7 @@ static const NSUInteger kAccountsMax = 32;
             [[self SIPAddressField] setEnabled:YES];
             [[self registrarField] setEnabled:YES];
             [[self cantEditAccountLabel] setHidden:YES];
+            [[self updateHeadersCheckBox] setEnabled:YES];
         }
         
         // Populate fields.
@@ -312,8 +294,8 @@ static const NSUInteger kAccountsMax = 32;
         
         // Reregister every...
         if ([[accountDict objectForKey:kReregistrationTime] integerValue] > 0) {
-            [[self reregistrationTimeField] setIntegerValue:
-             [[accountDict objectForKey:kReregistrationTime] integerValue]];
+            [[self reregistrationTimeField] setStringValue:
+             [[accountDict objectForKey:kReregistrationTime] stringValue]];
         } else {
             [[self reregistrationTimeField] setStringValue:@""];
         }
@@ -335,7 +317,7 @@ static const NSUInteger kAccountsMax = 32;
         
         // Proxy Port.
         if ([[accountDict objectForKey:kProxyPort] integerValue] > 0) {
-            [[self proxyPortField] setIntegerValue:[[accountDict objectForKey:kProxyPort] integerValue]];
+            [[self proxyPortField] setStringValue:[[accountDict objectForKey:kProxyPort] stringValue]];
         } else {
             [[self proxyPortField] setStringValue:@""];
         }
@@ -367,7 +349,14 @@ static const NSUInteger kAccountsMax = 32;
             [[[self registrarField] cell] setPlaceholderString:nil];
         }
         
-    } else {
+        // Update headers checkbox.
+        if ([accountDict[kUpdateContactHeader] boolValue] && [accountDict[kUpdateViaHeader] boolValue]) {
+            [[self updateHeadersCheckBox] setState:NSOnState];
+        } else {
+            [[self updateHeadersCheckBox] setState:NSOffState];
+        }
+        
+    } else {  // if (index >= 0)
         [[self accountEnabledCheckBox] setState:NSOffState];
         [[self accountDescriptionField] setStringValue:@""];
         [[[self accountDescriptionField] cell] setPlaceholderString:nil];
@@ -383,6 +372,7 @@ static const NSUInteger kAccountsMax = 32;
         [[self proxyPortField] setStringValue:@""];
         [[self SIPAddressField] setStringValue:@""];
         [[self registrarField] setStringValue:@""];
+        [[self updateHeadersCheckBox] setState:NSOffState];
         
         [[self accountEnabledCheckBox] setEnabled:NO];
         [[self accountDescriptionField] setEnabled:NO];
@@ -401,6 +391,7 @@ static const NSUInteger kAccountsMax = 32;
         [[self registrarField] setEnabled:NO];
         [[[self registrarField] cell] setPlaceholderString:nil];
         [[self cantEditAccountLabel] setHidden:YES];
+        [[self updateHeadersCheckBox] setEnabled:NO];
     }
 }
 
@@ -490,6 +481,14 @@ static const NSUInteger kAccountsMax = 32;
         
         [accountDict setObject:registrar forKey:kRegistrar];
         
+        if (self.updateHeadersCheckBox.state == NSOnState) {
+            accountDict[kUpdateContactHeader] = @YES;
+            accountDict[kUpdateViaHeader] = @YES;
+        } else {
+            accountDict[kUpdateContactHeader] = @NO;
+            accountDict[kUpdateViaHeader] = @NO;
+        }
+        
         // Set placeholders.
         
         if ([SIPAddress length] > 0) {
@@ -526,11 +525,12 @@ static const NSUInteger kAccountsMax = 32;
         [[self SIPAddressField] setEnabled:NO];
         [[self registrarField] setEnabled:NO];
         [[self cantEditAccountLabel] setHidden:NO];
+        [[self updateHeadersCheckBox] setEnabled:NO];
         
         // Mark accounts table as needing redisplay.
         [[self accountsTable] reloadData];
         
-    } else {
+    } else {  // if (isChecked)
         // User disabled the account - enable account fields, set checkboxes state.
         [[self accountDescriptionField] setEnabled:YES];
         [[self fullNameField] setEnabled:YES];
@@ -556,6 +556,7 @@ static const NSUInteger kAccountsMax = 32;
         [[self SIPAddressField] setEnabled:YES];
         [[self registrarField] setEnabled:YES];
         [[self cantEditAccountLabel] setHidden:YES];
+        [[self updateHeadersCheckBox] setEnabled:YES];
     }
     
     [savedAccounts replaceObjectAtIndex:index withObject:accountDict];
@@ -657,7 +658,7 @@ static const NSUInteger kAccountsMax = 32;
     NSInteger draggingRow = [indexes firstIndex];
     
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSMutableArray *accounts = [[[defaults arrayForKey:kAccounts] mutableCopy] autorelease];
+    NSMutableArray *accounts = [[defaults arrayForKey:kAccounts] mutableCopy];
     id selectedAccount = [accounts objectAtIndex:[[self accountsTable] selectedRow]];
     
     // Swap accounts.

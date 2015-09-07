@@ -55,13 +55,13 @@ extern NSString * const kEmailSIPLabel;
 @property (nonatomic, assign, getter=isEnabled) BOOL enabled;
 
 // A SIP account the receiver controls.
-@property (nonatomic, retain) AKSIPAccount *account;
+@property (nonatomic, strong) AKSIPAccount *account;
 
 // A Boolean value indicating whether account is registered.
 @property (nonatomic, assign, getter=isAccountRegistered) BOOL accountRegistered;
 
 // An array of call controllers managed by the receiver.
-@property (nonatomic, retain) NSMutableArray *callControllers;
+@property (nonatomic, strong) NSMutableArray *callControllers;
 
 // Account description.
 @property (nonatomic, copy) NSString *accountDescription;
@@ -87,7 +87,7 @@ extern NSString * const kEmailSIPLabel;
 @property (nonatomic, copy) NSString *catchedURLString;
 
 // Registrar network reachability. When registrar becomes reachable, we try to register the receiver's account.
-@property (nonatomic, retain) AKNetworkReachability *registrarReachability;
+@property (nonatomic, strong) AKNetworkReachability *registrarReachability;
 
 // A Boolean value indicating whether a plus character at the beginning of the phone number to be dialed should be
 // replaced.
@@ -103,19 +103,15 @@ extern NSString * const kEmailSIPLabel;
 @property (nonatomic, readonly) AuthenticationFailureController *authenticationFailureController;
 
 // Account state pop-up button outlet.
-@property (nonatomic, retain) IBOutlet NSPopUpButton *accountStatePopUp;
+@property (nonatomic, weak) IBOutlet NSPopUpButton *accountStatePopUp;
+
+// A Boolean value indicating if call windows should display account name.
+@property (nonatomic, assign) BOOL callsShouldDisplayAccountInfo;
 
 
 // Designated initializer.
 // Initializes an AccountController object with a given account.
 - (id)initWithSIPAccount:(AKSIPAccount *)anAccount;
-
-// Initializes an AccountController object with a given full name, SIP address, regisrar, realm, and user name.
-- (id)initWithFullName:(NSString *)aFullName
-            SIPAddress:(NSString *)aSIPAddress
-             registrar:(NSString *)aRegistrar
-                 realm:(NSString *)aRealm
-              username:(NSString *)aUsername;
 
 // Removes account from the user agent.
 - (void)removeAccountFromUserAgent;

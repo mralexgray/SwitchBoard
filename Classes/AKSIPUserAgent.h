@@ -102,10 +102,12 @@ extern NSString * const AKSIPUserAgentWillRemoveAccountNotification;
 }
 
 // The receiver's delegate.
+// |assign| instead of |weak| because possible candidates for delegate, i.e. NSWindowController and NSViewController,
+// don't support weak references in 10.7.
 @property (nonatomic, assign) id <AKSIPUserAgentDelegate> delegate;
 
 // Accounts added to the receiver.
-@property (readonly, retain) NSMutableArray *accounts;
+@property (nonatomic, readonly, strong) NSMutableArray *accounts;
 
 // A Boolean value indicating whether the receiver has been started.
 @property (nonatomic, readonly, assign, getter=isStarted) BOOL started;
@@ -114,10 +116,10 @@ extern NSString * const AKSIPUserAgentWillRemoveAccountNotification;
 @property (readonly, assign) AKSIPUserAgentState state;
 
 // NAT type that has been detected by the receiver.
-@property (assign) AKNATType detectedNATType;
+@property (nonatomic, assign) AKNATType detectedNATType;
 
 // A lock that is used to start and stop the receiver.
-@property (retain) NSLock *pjsuaLock;
+@property (strong) NSLock *pjsuaLock;
 
 // The number of acitve calls controlled by the receiver.
 @property (nonatomic, readonly, assign) NSUInteger activeCallsCount;
@@ -127,10 +129,6 @@ extern NSString * const AKSIPUserAgentWillRemoveAccountNotification;
 
 // A pool used by the underlying PJSUA library of the receiver.
 @property (readonly, assign) pj_pool_t *pjPool;
-
-@property (readonly, assign) NSInteger ringbackSlot;
-@property (nonatomic, assign) NSInteger ringbackCount;
-@property (readonly, assign) pjmedia_port *ringbackPort;
 
 // An array of DNS servers to use by the receiver. If set, DNS SRV will be
 // enabled. Only first kAKSIPUserAgentNameserversMax are used.
@@ -182,6 +180,9 @@ extern NSString * const AKSIPUserAgentWillRemoveAccountNotification;
 // Host name or IP address to advertise as the address of SIP transport.
 @property (nonatomic, copy) NSString *transportPublicHost;
 
+/// A Boolean value indicating if only G.711 codec is used.
+@property (nonatomic, assign) BOOL usesG711Only;
+
 
 // Returns the shared SIP user agent object.
 + (AKSIPUserAgent *)sharedUserAgent;
@@ -209,6 +210,12 @@ extern NSString * const AKSIPUserAgentWillRemoveAccountNotification;
 
 // Hangs up all calls controlled by the receiver.
 - (void)hangUpAllCalls;
+
+// Starts local ringback sound for the specified call.
+- (void)startRingbackForCall:(AKSIPCall *)call;
+
+// Stops local ringback sound for the specified call.
+- (void)stopRingbackForCall:(AKSIPCall *)call;
 
 // Sets sound input and output.
 - (BOOL)setSoundInputDevice:(NSInteger)input
